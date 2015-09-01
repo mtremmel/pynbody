@@ -767,7 +767,7 @@ class TipsySnap(SimSnap):
 
         if filename is None and array_name in ['massform', 'rhoform', 'tempform', 'phiform', 'nsmooth',
                                                'xform', 'yform', 'zform', 'vxform', 'vyform', 'vzform',
-                                               'posform', 'velform','h2form']:
+                                               'posform', 'velform','h2form','tcoolform']:
 
             try:
                 self.read_starlog()
@@ -918,7 +918,10 @@ class TipsySnap(SimSnap):
         #b(sl)['velform'] = sl['vel'][:len(self.star), :]
         if 'h2form' in sl.star.keys():
             b(b(b(sl))).star['h2form'] = b(b(sl)).star['h2form']
-        else: print "No H2 data found in StarLog file"
+	else: print "No H2 data found in StarLog file"
+	if 'tcoolform' in sl.star.keys():
+	    b(b(b(sl))).star['tcoolform'] = b(b(sl)).star['tcoolform']
+        else: print "No tcoolform data found in starlog file"
         for i, x in enumerate(['x', 'y', 'z']):
             self._arrays[x + 'form'] = self['posform'][:, i]
         for i, x in enumerate(['vx', 'vy', 'vz']):
@@ -1157,12 +1160,24 @@ class StarLog(SimSnap):
             file_structure = np.dtype({'names': ("iord", "iorderGas", "tform",
                                              "x", "y", "z",
                                              "vx", "vy", "vz",
-                                             "massform", "rhoform", "tempform","h2form"),
+                                             "massform", "rhoform", "tempform","tcoolform"),
                                    'formats': ('i4', 'i4', 'f8',
                                                'f8', 'f8', 'f8',
                                                'f8', 'f8', 'f8',
                                                'f8', 'f8', 'f8','f8')})
-            molecH = True
+            tcool = True
+	    print "cooling times found!"
+	if (iSize > file_structure.itemsize):
+	    file_structure = np.dtype({'names': ("iord", "iorderGas", "tform",
+                                             "x", "y", "z",
+                                             "vx", "vy", "vz",
+                                             "massform", "rhoform", "tempform","tcoolform","h2form"),
+                                   'formats': ('i4', 'i4', 'f8',
+                                               'f8', 'f8', 'f8',
+                                               'f8', 'f8', 'f8',
+                                               'f8', 'f8', 'f8','f8','f8')})
+	    molecH = True
+	    print "h2 info found!"
         if (iSize != file_structure.itemsize):
             file_structure = np.dtype({'names': ("iord", "iorderGas", "tform",
                                                  "x", "y", "z",
@@ -1175,6 +1190,8 @@ class StarLog(SimSnap):
                                                    'f8', 'f8', 'f8',
                                                    'f8', 'i4')})
             molecH = False
+	    tcool = False
+	    print "Just kidding! different file structure! H2 and tcool not on!"
 
             if (iSize != file_structure.itemsize and iSize != 104):
                 raise IOError, "Unknown starlog structure iSize:" + \
@@ -1223,6 +1240,8 @@ class StarLog(SimSnap):
             ["iorderGas", "massform", "rhoform", "tempform", "metals", "tform"])
         if molecH==True:
             self._create_arrays(["h2form"])
+	if tcool==True:
+	    self._create_arrays(["tcoolform"])
         if bigstarlog:
             self._create_arrays(["phiform", "nsmooth"])
 
@@ -1570,4 +1589,6 @@ def slparam2units(sim):
 
         sim.star["rhoform"].units = denunit_st
         sim.star["massform"].units = munit_st
+	if "tcoolform" in sim.star.keys():
+		sim.star["tcoolform"].units = timeunit_st
 
