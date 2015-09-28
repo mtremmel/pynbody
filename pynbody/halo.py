@@ -600,7 +600,6 @@ class RockstarCatalogueOneCpu(HaloCatalogue):
         if isinstance(self._halos[num], DummyHalo) and not self._dummy:
             self._load_rs_particles_for_halo(num)
 
-
     def _load_ahf_substructure(self, filename):
         f = util.open_(filename)
 
