@@ -1139,6 +1139,7 @@ class StarLog(SimSnap):
         self.properties = {}
         bigstarlog = False
         molecH = False
+	tcool = False
 
         file_structure = np.dtype({'names': ("iord", "iorderGas", "tform",
                                              "x", "y", "z",
