@@ -168,7 +168,7 @@ class NchiladaSnap(SimSnap):
     def _can_load(f):
         return os.path.isdir(f) and os.path.exists(os.path.join(f, "description.xml"))
 
-@nchilada.NchiladaSnap.decorator
+@NchiladaSnap.decorator
 def settime(sim):
     if sim._paramfile.has_key('bComove') and int(sim._paramfile['bComove']) != 0:
         #t = sim._header_t
