@@ -167,33 +167,3 @@ class NchiladaSnap(SimSnap):
     @staticmethod
     def _can_load(f):
         return os.path.isdir(f) and os.path.exists(os.path.join(f, "description.xml"))
-
-@NchiladaSnap.decorator
-def settime(sim):
-    if sim._paramfile.has_key('bComove') and int(sim._paramfile['bComove']) != 0:
-        #t = sim._header_t
-        #sim.properties['a'] = t
-        try:
-            sim.properties['z'] = 1.0 / t - 1.0
-        except ZeroDivisionError:
-            # no sensible redshift
-            pass
-
-        if (sim.properties['z'] is not None and
-                sim._paramfile.has_key('dMsolUnit') and
-                sim._paramfile.has_key('dKpcUnit')):
-            from ..analysis import cosmology
-            sim.properties['time'] = cosmology.age(
-                sim, unit=sim.infer_original_units('yr'))
-        else:
-            # something has gone wrong with the cosmological side of
-            # things
-            warnings.warn(
-                "Paramfile suggests time is cosmological, but header values are not sensible in this context.", RuntimeWarning)
-            sim.properties['time'] = sim.properties['a']
-
-        #sim.properties['a'] = t
-
-    else:
-        # Assume a non-cosmological run
-        sim.properties['time'] = sim.properties['a']
