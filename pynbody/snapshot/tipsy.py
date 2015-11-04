@@ -1575,6 +1575,15 @@ def settimeN(sim):
         # Assume a non-cosmological run
         sim.properties['time'] = sim.properties['a']
 
+    time_unit = None
+    try:
+        time_unit = self.infer_original_units('yr')
+    except units.UnitsException:
+        pass
+
+    if time_unit is not None:
+        self.properties['time'] *= time_unit
+
 
 @StarLog.decorator
 def slparam2units(sim):
