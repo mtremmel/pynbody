@@ -1545,7 +1545,7 @@ def settime(sim):
         # Assume a non-cosmological run
         sim.properties['time'] = sim._header_t
 
-@NchiladaSnap.decorator
+@nchilada.NchiladaSnap.decorator
 def settimeN(sim):
     if sim._paramfile.has_key('bComove') and int(sim._paramfile['bComove']) != 0:
         #t = sim._header_t
