@@ -1516,7 +1516,6 @@ def param2units(sim):
 
 
 @TipsySnap.decorator
-@nchilada.NchiladaSnap.decorator
 def settime(sim):
     if sim._paramfile.has_key('bComove') and int(sim._paramfile['bComove']) != 0:
         t = sim._header_t
