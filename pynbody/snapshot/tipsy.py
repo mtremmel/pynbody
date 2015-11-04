@@ -1551,7 +1551,7 @@ def settimeN(sim):
         #t = sim._header_t
         #sim.properties['a'] = t
         try:
-            sim.properties['z'] = 1.0 / t - 1.0
+            sim.properties['z'] = 1.0 / sim.properties['a'] - 1.0
         except ZeroDivisionError:
             # no sensible redshift
             pass
