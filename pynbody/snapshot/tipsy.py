@@ -1577,12 +1577,12 @@ def settimeN(sim):
 
     time_unit = None
     try:
-        time_unit = self.infer_original_units('yr')
+        time_unit = sim.infer_original_units('yr')
     except units.UnitsException:
         pass
 
     if time_unit is not None:
-        self.properties['time'] *= time_unit
+        sim.properties['time'] *= time_unit
 
 
 @StarLog.decorator
