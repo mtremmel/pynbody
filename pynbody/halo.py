@@ -191,7 +191,7 @@ class RockstarIntermediateCatalogue(HaloCatalogue):
         halo_info = self._halo_info[num]
         with util.open_(self._particles_filename) as f:
             f.seek(halo_info['indstart']*self._part_type.itemsize)
-            halo_ptcls=np.fromfile(f,dtype=self._part_type,count=halo_info['num_p'])
+            halo_ptcls=np.fromfile(f,dtype=self._part_type,count=halo_info['num_p']-1)
             #halo_ptcls = self._iord_to_fpos[halo_ptcls]
             halo_ptcls.sort()
 
@@ -227,7 +227,11 @@ class RockstarIntermediateCatalogue(HaloCatalogue):
     def _init_index(self):
         with open(self._index_filename,"rb") as f:
             self._nhalos = np.fromfile(f,np.int64,1)[0]
-            self._halo_info = np.fromfile(f,self._halo_type,self._nhalos)
+            #self._halo_info = np.fromfile(f,self._halo_type,self._nhalos)
+            self._halo_info = np.fromfile(f,self._halo_type,-1)
+            ok, = np.where(self._halo_info['indstart']>=0)
+            self._halo_info = self._halo_info[ok]
+
 
     def _sort_index(self):
         self._halo_info[::-1].sort(order='num_p')
