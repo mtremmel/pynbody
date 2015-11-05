@@ -177,7 +177,7 @@ def age(self):
     """Stellar age determined from formation time and current snapshot time"""
     try:
         return self.properties['time'].in_units(self['tform'].units, **self.conversion_context()) - self['tform']
-    except KeyError
+    except KeyError:
         return self.properties['time'].in_units(self['timeform'].units, **self.conversion_context()) - self['timeform']
 
 bands_available = ['u', 'b', 'v', 'r', 'i', 'j', 'h', 'k', 'U', 'B', 'V', 'R', 'I',
