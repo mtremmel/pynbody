@@ -294,11 +294,6 @@ def aform(self):
     """The expansion factor at the time specified by the tform array."""
 
     from . import analysis
-    formkey = 'tform'
-    try:
-        self['tform']
-    except KeyError:
-        formkey = 'timeform'
-    z = analysis.cosmology.redshift(self, self[formkey])
+    z = analysis.cosmology.redshift(self, self['tform'])
     a = 1. / (1. + z)
     return a
