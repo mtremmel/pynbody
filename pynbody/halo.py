@@ -207,7 +207,7 @@ class RockstarIntermediateCatalogue(HaloCatalogue):
                 onep = load(self.base.filename, take = one_ptcl)
                 halo.properties['rockstar_halo_id'] = onep.dm['grpid'][0]
 
-    def _get_halo(self, i:
+    def _get_halo(self, i):
         if self.base is None:
             raise RuntimeError("Parent SimSnap has been deleted")
 
