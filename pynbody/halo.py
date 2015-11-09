@@ -168,8 +168,9 @@ class RockstarIntermediateCatalogue(HaloCatalogue):
     _halo_type = np.dtype([('id',np.int64),('num_p',np.int64),('indstart',np.int64)])
     _part_type = np.dtype('int64')
 
-    def __init__(self, sim, sort=True):
+    def __init__(self, sim, sort=True, correct=False):
         assert isinstance(sim,snapshot.SimSnap)
+        self._correct=correct
         HaloCatalogue.__init__(self, sim)
 
         self._halos = {}
@@ -199,14 +200,20 @@ class RockstarIntermediateCatalogue(HaloCatalogue):
 
     def _add_halo_id(self, halo, num):
         halo.properties['rockstar_halo_id']=self._halo_info[num]['id']
+        if self._correct is True:
+            with util.open_(self._particles_filename) as f:
+                f.seek(halo_info['indstart'][num]['indstart']*self._part_type.itemsize)
+                one_ptcl = np.fromfile(f,dtype=self._part_type,count=1)
+                onep = load(self.base.filename, take = one_ptcl)
+                halo.properties['rockstar_halo_id'] = onep.dm['grpid'][0]
 
-    def _get_halo(self, i):
+    def _get_halo(self, i:
         if self.base is None:
             raise RuntimeError("Parent SimSnap has been deleted")
 
         halo_ptcls = self._get_particles_for_halo(i)
         h = Halo(i, self, self.base, halo_ptcls)
-        self._add_halo_id(h,i)
+        self._add_halo_id(h,i,correct=correct)
         return h
 
     def load_copy(self, i):
@@ -218,6 +225,7 @@ class RockstarIntermediateCatalogue(HaloCatalogue):
         halo = load(self.base.filename, take=self._get_particles_for_halo(i))
         self._add_halo_id(halo, i)
         return halo
+
 
     @staticmethod
     def _can_load(sim,*args,**kwargs):
