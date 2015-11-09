@@ -42,7 +42,7 @@ def calc_mags(simstars, band='v'):
     # data is from http://stev.oapd.inaf.it/cgi-bin/cmd
     # Padova group stellar populations Marigo et al (2008), Girardi et al
     # (2010)
-    lumfile = os.path.join(os.path.dirname(__file__), "cmdlum.npz")
+    lumfile = os.path.join(os.path.dirname(__file__), "cmd.kroupa.Johnson.npz")
     if os.path.exists(lumfile):
         lums = np.load(lumfile)
     else:
