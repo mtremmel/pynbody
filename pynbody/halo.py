@@ -213,7 +213,7 @@ class RockstarIntermediateCatalogue(HaloCatalogue):
 
         halo_ptcls = self._get_particles_for_halo(i)
         h = Halo(i, self, self.base, halo_ptcls)
-        self._add_halo_id(h,i,correct=correct)
+        self._add_halo_id(h,i)
         return h
 
     def load_copy(self, i):
