@@ -204,6 +204,7 @@ class RockstarIntermediateCatalogue(HaloCatalogue):
             with util.open_(self._particles_filename) as f:
                 f.seek(self._halo_info['indstart'][num]*self._part_type.itemsize)
                 one_ptcl = np.fromfile(f,dtype=self._part_type,count=1)
+                from . import load
                 onep = load(self.base.filename, take = one_ptcl)
                 halo.properties['rockstar_halo_id'] = onep.dm['grpid'][0]
 
