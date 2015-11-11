@@ -206,6 +206,9 @@ class RockstarIntermediateCatalogue(HaloCatalogue):
                 one_ptcl = np.fromfile(f,dtype=self._part_type,count=1)
                 from . import load
                 onep = load(self.base.filename, take = one_ptcl)
+                while len(onep.dm) == 0 and len(onep.g) == 0:
+                    one_ptcl = np.fromfile(f,dtype=self._part_type,count=1)
+                    onep = load(self.base.filename, take = one_ptcl)
                 halo.properties['rockstar_halo_id'] = onep.dm['grpid'][0]
 
     def _get_halo(self, i):
