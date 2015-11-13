@@ -261,8 +261,8 @@ class RockstarIntermediateCatalogue(HaloCatalogue):
         fpos_ar = target.get_index_list(self.base)
         with util.open_(self._particles_filename) as f:
             for i in range(len(self._halo_info)):
-                f.seek(halo_info[i]['indstart']*self._part_type.itemsize)
-                halo_ptcls=np.fromfile(f,dtype=self._part_type,count=halo_info[i]['num_p']-1)
+                f.seek(self._halo_info[i]['indstart']*self._part_type.itemsize)
+                halo_ptcls=np.fromfile(f,dtype=self._part_type,count=self._halo_info[i]['num_p']-1)
                 match, = np.where(np.in1d(fpos_ar, halo_ptcls))
                 ar[match] = i
         return ar
