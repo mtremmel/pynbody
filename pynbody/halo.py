@@ -248,13 +248,23 @@ class RockstarIntermediateCatalogue(HaloCatalogue):
     def _sort_index(self):
         self._halo_info[::-1].sort(order='num_p')
 
-    def get_group_array(self):
-        ar = -1 * np.ones(len(self.base), dtype=int)
+    def get_fam_group_array(self, family='star'):
+        if family == 'star':
+            target = self.base.star
+        if family == 'gas':
+            target = self.base.gas
+        if family == 'dark':
+            target = self.base.dark
+        if family not in ['star','gas','darl']:
+            raise TypeError("family input not understood. Must be star, gas, or dark")
+        ar = -1 * np.ones(len(target))
+        fpos_ar = target.get_index_list(self.base)
         with util.open_(self._particles_filename) as f:
             for i in range(len(self._halo_info)):
                 f.seek(halo_info[i]['indstart']*self._part_type.itemsize)
                 halo_ptcls=np.fromfile(f,dtype=self._part_type,count=halo_info[i]['num_p']-1)
-                ar[halo_ptcls] = i
+                match, = np.where(np.in1d(fpos_ar, halo_ptcls))
+                ar[match] = i
         return ar
 
 
