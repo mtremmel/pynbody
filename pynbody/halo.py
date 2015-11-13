@@ -269,7 +269,6 @@ class RockstarIntermediateCatalogue(HaloCatalogue):
                 #print i, len(self._halo_info)
                 if i%100 == 0: print float(i)/float(len(self._halo_info))*100, "% done"
                 f.seek(self._halo_info[i]['indstart']*self._part_type.itemsize)
-                print "here1"
                 halo_ptcls=np.fromfile(f,dtype=self._part_type,count=self._halo_info[i]['num_p']-1)
                 if family == 'gas':
                     halo_ptcls = halo_ptcls[(halo_ptcls>=ndark)&(halo_ptcls<ndark+ngas)]
@@ -277,9 +276,7 @@ class RockstarIntermediateCatalogue(HaloCatalogue):
                     halo_ptcls = halo_ptcls[(halo_ptcls<ndark)]
                 if family == 'star' or family == 'BH':
                     halo_ptcls = halo_ptcls[(halo_ptcls>=ndark+ngas)]
-                print "here2"
                 match, = np.where(np.in1d(fpos_ar, halo_ptcls))
-                print 'here3'
                 ar[match] = i
         return ar
 
