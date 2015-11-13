@@ -255,7 +255,10 @@ class RockstarIntermediateCatalogue(HaloCatalogue):
             target = self.base.gas
         if family == 'dark':
             target = self.base.dark
-        if family not in ['star','gas','darl']:
+        if family == 'BH':
+            temptarget = self.base.star
+            target = temptarget[(temptarget['tform']<0)]
+        if family not in ['star','gas','dark', 'BH']:
             raise TypeError("family input not understood. Must be star, gas, or dark")
         ar = -1 * np.ones(len(target))
         fpos_ar = target.get_index_list(self.base)
