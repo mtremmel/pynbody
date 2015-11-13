@@ -262,6 +262,8 @@ class RockstarIntermediateCatalogue(HaloCatalogue):
             raise TypeError("family input not understood. Must be star, gas, or dark")
         ar = -1 * np.ones(len(target))
         fpos_ar = target.get_index_list(self.base)
+        ngas = len(self.base.gas)
+        ndark = len(self.base.dark)
         with util.open_(self._particles_filename) as f:
             for i in range(len(self._halo_info)):
                 print i, len(self._halo_info)
@@ -269,6 +271,12 @@ class RockstarIntermediateCatalogue(HaloCatalogue):
                 f.seek(self._halo_info[i]['indstart']*self._part_type.itemsize)
                 print "here1"
                 halo_ptcls=np.fromfile(f,dtype=self._part_type,count=self._halo_info[i]['num_p']-1)
+                if family == 'gas':
+                    halo_ptcls = halo_ptcls[(halo_ptcls>=ndark)&(halo_ptcls<ndark+ngas)]
+                if family == 'dark':
+                    halo_ptcls = halo_ptcls[(halo_ptcls<ndark)]
+                if family == 'star' or family == 'BH':
+                    halo_ptcls = halo_ptcls[(halo_ptcls>=ndark+ngas)]
                 print "here2"
                 match, = np.where(np.in1d(fpos_ar, halo_ptcls))
                 print 'here3'
