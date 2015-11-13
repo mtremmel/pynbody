@@ -248,6 +248,18 @@ class RockstarIntermediateCatalogue(HaloCatalogue):
     def _sort_index(self):
         self._halo_info[::-1].sort(order='num_p')
 
+    def get_group_array(self):
+        ar = -1 * np.ones(len(self.base), dtype=int)
+        with util.open_(self._particles_filename) as f:
+            for i in range(len(self._halo_info)):
+                f.seek(halo_info[i]['indstart']*self._part_type.itemsize)
+                halo_ptcls=np.fromfile(f,dtype=self._part_type,count=halo_info[i]['num_p']-1)
+                ar[halo_ptcls] = i
+        return ar
+
+
+
+
 
 
 
