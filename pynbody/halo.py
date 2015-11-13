@@ -266,8 +266,8 @@ class RockstarIntermediateCatalogue(HaloCatalogue):
         ndark = len(self.base.dark)
         with util.open_(self._particles_filename) as f:
             for i in range(len(self._halo_info)):
-                print i, len(self._halo_info)
-                #if i%100 == 0: print float(i)/float(len(self._halo_info))*100, "% done"
+                #print i, len(self._halo_info)
+                if i%100 == 0: print float(i)/float(len(self._halo_info))*100, "% done"
                 f.seek(self._halo_info[i]['indstart']*self._part_type.itemsize)
                 print "here1"
                 halo_ptcls=np.fromfile(f,dtype=self._part_type,count=self._halo_info[i]['num_p']-1)
