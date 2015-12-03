@@ -893,7 +893,7 @@ class AHFCatalogue(HaloCatalogue):
         if top_level is False:
             for halo in self._halos.values():
                 ar[halo.get_index_list(self.base)] = halo._halo_id
-        if top_leve is True:
+        if top_level is True:
             for halo in self._halos.values()[::-1]:
                 ar[halo.get_index_list(self.base)] = halo._halo_id
         return ar
