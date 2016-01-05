@@ -1157,6 +1157,8 @@ class StarLog(SimSnap):
             size = struct.unpack(">i", f.read(4))
         iSize = size[0]
 
+
+
         if (iSize > file_structure.itemsize):
             file_structure = np.dtype({'names': ("iord", "iorderGas", "tform",
                                              "x", "y", "z",

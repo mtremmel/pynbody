@@ -239,7 +239,7 @@ def bridge_factory(a, b):
     if type(a_top) is not type(b_top):
         raise RuntimeError, "Don't know how to automatically bridge between two simulations of different formats. You will need to create your bridge manually by instantiating either the Bridge or OrderBridge class appropriately."
 
-    if (isinstance(a_top, tipsy.TipsySnap) or isinstance(a_top, nchilada.NChiladaSnap)):
+    if (isinstance(a_top, tipsy.TipsySnap) or isinstance(a_top, nchilada.NchiladaSnap)):
         if "iord" in a_top.loadable_keys():
             return OrderBridge(a_top, b_top, monotonic=True)
         else:
