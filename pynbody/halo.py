@@ -261,7 +261,8 @@ class RockstarIntermediateCatalogue(HaloCatalogue):
         if family not in ['star','gas','dark', 'BH']:
             raise TypeError("family input not understood. Must be star, gas, or dark")
         ar = -1 * np.ones(len(target))
-        fpos_ar = target.get_index_list(self.base)
+        if family != 'dark':
+            fpos_ar = target.get_index_list(self.base)
         ngas = len(self.base.gas)
         ndark = len(self.base.dark)
         with util.open_(self._particles_filename) as f:
@@ -276,8 +277,11 @@ class RockstarIntermediateCatalogue(HaloCatalogue):
                     halo_ptcls = halo_ptcls[(halo_ptcls<ndark)]
                 if family == 'star' or family == 'BH':
                     halo_ptcls = halo_ptcls[(halo_ptcls>=ndark+ngas)]
-                match, = np.where(np.in1d(fpos_ar, halo_ptcls))
-                ar[match] = i
+                if family != 'dark':
+                    match, = np.where(np.in1d(fpos_ar, halo_ptcls))
+                    ar[match] = i
+                else:
+                    ar[halo_ptcls] = i
         return ar
 
 
