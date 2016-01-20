@@ -109,7 +109,7 @@ class Bridge(object):
         return identification
 
     def fuzzy_match_catalog(self, min_index=1, max_index=30, threshold=0.01,
-                            groups_1 = None, groups_2 = None, use_family=None):
+                            groups_1 = None, groups_2 = None, use_family=None, memeff=False):
         """fuzzy_match_catalog returns, for each halo in groups_1, a list of possible
         identifications in groups_2, along with the fraction of particles in common
         between the two.
@@ -121,7 +121,7 @@ class Bridge(object):
         If no identification is found, the entry is the empty list [].
         """
 
-        transfer_matrix = self.catalog_transfer_matrix(min_index,max_index,groups_1,groups_2,use_family)
+        transfer_matrix = self.catalog_transfer_matrix(min_index,max_index,groups_1,groups_2,use_family,memeff)
 
         output = [[]]*min_index
         for row in transfer_matrix:
