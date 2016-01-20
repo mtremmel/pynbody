@@ -137,7 +137,7 @@ class Bridge(object):
 
         return output
 
-    def catalog_transfer_matrix(self, min_index=1, max_index=30, groups_1=None, groups_2=None,use_family=None):
+    def catalog_transfer_matrix(self, min_index=1, max_index=30, groups_1=None, groups_2=None,use_family=None,memeff=False):
         """Return a max_index x max_index matrix with the number of particles transferred from
         the row group in groups_1 to the column group in groups_2.
 
@@ -159,7 +159,7 @@ class Bridge(object):
             end = end[use_family]
             start = start[use_family]
 
-        if type(groups_1) != pynbody.halo.RockstarIntermediateCatalogue:
+        if memeff is False:
 
             restriction_end = self(self(end)).get_index_list(end.ancestor)
             restriction_start = self(self(start)).get_index_list(start.ancestor)
