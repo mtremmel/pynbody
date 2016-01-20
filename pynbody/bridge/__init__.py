@@ -159,13 +159,20 @@ class Bridge(object):
             end = end[use_family]
             start = start[use_family]
 
-        restriction_end = self(self(end)).get_index_list(end.ancestor)
-        restriction_start = self(self(start)).get_index_list(start.ancestor)
+        if type(groups_1) != pynbody.halo.RockstarIntermediateCatalogue:
 
-        assert len(restriction_end) == len(
-            restriction_start), "Internal consistency failure in catalog_transfer_matrix: particles supposedly common to both simulations have two different lengths"
-        g1 = groups_1.get_group_array()[restriction_start]
-        g2 = groups_2.get_group_array()[restriction_end]
+            restriction_end = self(self(end)).get_index_list(end.ancestor)
+            restriction_start = self(self(start)).get_index_list(start.ancestor)
+
+            assert len(restriction_end) == len(
+                restriction_start), "Internal consistency failure in catalog_transfer_matrix: particles supposedly common to both simulations have two different lengths"
+            g1 = groups_1.get_group_array()[restriction_start]
+            g2 = groups_2.get_group_array()[restriction_end]
+
+        else:
+
+            g1 = groups_1.get_fam_group_array(family='dark')
+            g2 = groups_2.get_fam_group_array(family='dark')
 
         transfer_matrix = _bridge.match(g1, g2, min_index, max_index)
 
