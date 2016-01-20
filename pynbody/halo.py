@@ -282,7 +282,7 @@ class RockstarIntermediateCatalogue(HaloCatalogue):
                     ar[match] = i
                 else:
                     ar[halo_ptcls] = i
-        return ar
+        return ar.astype(np.int)
 
 
 
