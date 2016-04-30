@@ -233,7 +233,7 @@ class RockstarIntermediateCatalogue(HaloCatalogue):
 
     @staticmethod
     def _can_load(sim,*args,**kwargs):
-        return os.path.exists(sim.filename+".rockstar.halos") and os.path.exists(sim.filename+".rockstar.halo_particles")
+        return os.path.exists(sim.filename+".rockstar.halos") and os.path.exists(sim.filename+".rockstar.halo_particles_fpos")
 
 
     def _init_index(self):
