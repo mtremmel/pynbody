@@ -299,7 +299,7 @@ class GadgetFile(object):
                 	((self.header.npart != 0) * (self.header.mass == 0)).sum()==0):
                     # The "Spec" says that if all the existing particle masses
                     # are in the header, we shouldn't have a MASS block
-                    self.block_names.remove('MASS')
+                    self.block_names.remove(b"MASS")
                 continue
             # Set the partlen, using our amazing heuristics
             success = False
@@ -935,20 +935,23 @@ class GadgetSnap(SimSnap):
             self[fam][name].set_default_units(quiet=True)
 
     def __load_array(self, g_name, p_type):
-        """Internal helper function for _load_array that takes a g_name and a gadget type,
-        gets the data from each file and returns it as one long array."""
-        data = np.array([], dtype=self._get_array_type_g(g_name))
-        # Get a type from each file
-        for f in self._files:
-            f_parts = f.get_block_parts(g_name, p_type)
-            if f_parts == 0:
-                continue
-            (f_read, f_data) = f.get_block(g_name, p_type, f_parts)
-            if f_read != f_parts:
-                raise IOError("Read of " + f._filename + " asked for " + str(
-                    f_parts) + " particles but got " + str(f_read))
-            data = np.append(data, f_data)
-        return data
+       """Internal helper function for _load_array that takes a g_name and a gadget type,
+       gets the data from each file and returns it as one long array."""
+       data = np.array(np.zeros(self._get_array_dims(g_name) * self.header.npart[p_type]), dtype=self._get_array_type_g(g_name))
+       # Get a type from each file
+       ipos = 0
+       for f in self._files:
+           f_parts = f.get_block_parts(g_name, p_type)
+           if f_parts == 0:
+               continue
+           (f_read, f_data) = f.get_block(g_name, p_type, f_parts)
+           if f_read != f_parts:
+               raise IOError("Read of " + f._filename + " asked for " + str(
+                   f_parts) + " particles but got " + str(f_read))
+           iread = self._get_array_dims(g_name)*f.header.npart[p_type]
+           data[ipos:ipos + iread] = f_data
+           ipos += iread
+       return data
 
     @staticmethod
     def _can_load(f):
