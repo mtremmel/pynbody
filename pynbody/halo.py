@@ -178,7 +178,6 @@ class RockstarIntermediateCatalogue(HaloCatalogue):
         self._index_filename = sim.filename+".rockstar.halos"
         self._particles_filename = sim.filename+".rockstar.halo_particles_fpos"
 
-        #self._init_iord_to_fpos()
 
         self._init_index()
         if sort:
@@ -188,13 +187,14 @@ class RockstarIntermediateCatalogue(HaloCatalogue):
         return self._nhalos
 
     def _get_particles_for_halo(self, num):
-        #self._init_iord_to_fpos()
+
         halo_info = self._halo_info[num]
         with util.open_(self._particles_filename) as f:
             f.seek(halo_info['indstart']*self._part_type.itemsize)
             halo_ptcls=np.fromfile(f,dtype=self._part_type,count=halo_info['num_p']-1)
-            #halo_ptcls = self._iord_to_fpos[halo_ptcls]
+
             halo_ptcls.sort()
+
 
         return halo_ptcls
 
@@ -233,7 +233,9 @@ class RockstarIntermediateCatalogue(HaloCatalogue):
 
     @staticmethod
     def _can_load(sim,*args,**kwargs):
-        return os.path.exists(sim.filename+".rockstar.halos") and os.path.exists(sim.filename+".rockstar.halo_particles_fpos")
+
+        return os.path.exists(sim.filename+".rockstar.halos") and \
+               os.path.exists(sim.filename+".rockstar.halo_particles_fpos")
 
 
     def _init_index(self):
@@ -283,11 +285,6 @@ class RockstarIntermediateCatalogue(HaloCatalogue):
                 else:
                     ar[halo_ptcls] = i
         return ar.astype(np.int)
-
-
-
-
-
 
 
 
@@ -897,7 +894,8 @@ class AHFCatalogue(HaloCatalogue):
         if top_level is False:
             for halo in self._halos.values():
                 ar[halo.get_index_list(self.base)] = halo._halo_id
-        if top_level is True:
+
+        else:
             for halo in self._halos.values()[::-1]:
                 ar[halo.get_index_list(self.base)] = halo._halo_id
         return ar
