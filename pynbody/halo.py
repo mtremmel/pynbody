@@ -890,7 +890,7 @@ class AHFCatalogue(HaloCatalogue):
 
     def __getitem__(self,item):
         if self._dosort is not None:
-            i = self._sorted_indices[item]
+            i = self._sorted_indices[item-1]
         else:
             i = item
         super(AHFCatalogue,self).__getitem__(self,i)
