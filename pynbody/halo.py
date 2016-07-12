@@ -866,7 +866,7 @@ class AHFCatalogue(HaloCatalogue):
         self._load_ahf_halos(self._ahfBasename + 'halos')
 
         if dosort is not None:
-            nparr = np.array([self._halos[i_1].properties['npart'] for i in range(self._nhalos)])
+            nparr = np.array([self._halos[i+1].properties['npart'] for i in range(self._nhalos)])
             osort = np.argsort(nparr)[::-1]
             self._sorted_indices = osort + 1
 
