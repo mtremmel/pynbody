@@ -946,7 +946,7 @@ class AHFCatalogue(HaloCatalogue):
         """Load the a fresh SimSnap with only the particle in halo i"""
 
         if self._dosort is not None:
-            i = self._sorted_indices[i]
+            i = self._sorted_indices[i-1]
 
         from . import load
 
