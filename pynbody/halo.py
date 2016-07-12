@@ -936,10 +936,10 @@ class AHFCatalogue(HaloCatalogue):
 
         f = util.open_(self._ahfBasename + 'particles')
 
-        if self.isnew:
-            nhalos = int(f.readline())
-        else:
-            nhalos = self._nhalos
+        #if self.isnew:
+            #nhalos = int(f.readline())
+        #else:
+            #nhalos = self._nhalos
 
         for h in xrange(i):
             ids = self._load_ahf_particle_block(f)
