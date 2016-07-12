@@ -78,7 +78,7 @@ class HaloCatalogue(object):
             print "here3"
             return self._halos[i]  # ()
         else:
-            print "here3"
+            print "here4"
             h = self._get_halo(i)
             self._halos[i] = h  # weakref.ref(h)
             return h
