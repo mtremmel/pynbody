@@ -952,7 +952,11 @@ class AHFCatalogue(HaloCatalogue):
         """Load the particles for the next halo described in particle file f"""
         ng = len(self.base.gas)
         nds = len(self.base.dark) + len(self.base.star)
-        nparts = int(f.readline().split()[0])
+        startline = f.readline()
+        if len((startline.split()))==1:
+            startline = f.readline()
+        #nparts = int(f.readline().split()[0])
+        nparts = int(startline.split()[0])
 
         if self.isnew:
             if not isinstance(f, gzip.GzipFile):
@@ -993,18 +997,18 @@ class AHFCatalogue(HaloCatalogue):
         else:
             self.isnew = False
 
-        if self.isnew:
-            nhalos = int(f.readline())
-        else:
-            nhalos = self._nhalos
+        #if self.isnew:
+            #nhalos = int(f.readline())
+        #else:
+            #nhalos = self._nhalos
 
         if not self._dummy:
-            for h in xrange(nhalos):
+            for h in xrange(self._nhalos):
                 self._halos[h + 1] = Halo(
                     h + 1, self, self.base, self._load_ahf_particle_block(f))
                 self._halos[h + 1]._descriptor = "halo_" + str(h + 1)
         else:
-            for h in xrange(nhalos):
+            for h in xrange(self._nhalos):
                 self._halos[h + 1] = DummyHalo()
 
         f.close()
