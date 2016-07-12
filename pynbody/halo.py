@@ -797,7 +797,7 @@ class AHFCatalogue(HaloCatalogue):
     Class to handle catalogues produced by Amiga Halo Finder (AHF).
     """
 
-    def __init__(self, sim, make_grp=None, dummy=False, use_iord=None, ahf_basename=None):
+    def __init__(self, sim, make_grp=None, dummy=False, use_iord=None, ahf_basename=None, dosort=None):
         """Initialize an AHFCatalogue.
 
         **kwargs** :
@@ -838,6 +838,7 @@ class AHFCatalogue(HaloCatalogue):
         self._use_iord = use_iord
 
         self._dummy = dummy
+        self._dosort = dosort
 
         if ahf_basename is not None:
             self._ahfBasename = ahf_basename
@@ -864,6 +865,11 @@ class AHFCatalogue(HaloCatalogue):
 
         self._load_ahf_halos(self._ahfBasename + 'halos')
 
+        if dosort is not None:
+            nparr = np.array([h.properties['npart'] for h in self._halos])
+            osort = np.argsort(nparr)[::-1]
+            self._sorted_indices = osort
+
         if os.path.isfile(self._ahfBasename + 'substructure'):
             logger.info("AHFCatalogue loading substructure")
 
@@ -881,6 +887,13 @@ class AHFCatalogue(HaloCatalogue):
             sim['pid'] = np.arange(0, len(sim))
 
         logger.info("AHFCatalogue loaded")
+
+    def __getitem__(self,item):
+        if self._dosort is not None:
+            i = self._sorted_indices[item]
+        else:
+            i = item
+        super(AHFCatalogue,self).__getitem__(i)
 
     def make_grp(self, name='grp'):
         """
@@ -931,6 +944,9 @@ class AHFCatalogue(HaloCatalogue):
 
     def load_copy(self, i):
         """Load the a fresh SimSnap with only the particle in halo i"""
+
+        if self._dosort is not None:
+            i = self._sorted_indices[i]
 
         from . import load
 
