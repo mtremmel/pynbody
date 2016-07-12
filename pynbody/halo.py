@@ -866,9 +866,9 @@ class AHFCatalogue(HaloCatalogue):
         self._load_ahf_halos(self._ahfBasename + 'halos')
 
         if dosort is not None:
-            nparr = np.array([h.properties['npart'] for h in self._halos])
+            nparr = np.array([self._halos[i_1].properties['npart'] for i in range(self._nhalos)])
             osort = np.argsort(nparr)[::-1]
-            self._sorted_indices = osort
+            self._sorted_indices = osort + 1
 
         if os.path.isfile(self._ahfBasename + 'substructure'):
             logger.info("AHFCatalogue loading substructure")
