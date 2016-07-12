@@ -75,8 +75,10 @@ class HaloCatalogue(object):
 
     def calc_item(self, i):
         if i in self._halos:  # and self._halos[i]() is not None :
+            print "here3"
             return self._halos[i]  # ()
         else:
+            print "here3"
             h = self._get_halo(i)
             self._halos[i] = h  # weakref.ref(h)
             return h
@@ -89,11 +91,13 @@ class HaloCatalogue(object):
 
     def __getitem__(self, item):
         if isinstance(item, slice):
+            print "here"
             for x in self._halo_generator(item.start,item.stop) : pass
             indices = item.indices(len(self._halos))
             res = [self.calc_item(i) for i in range(*indices)]
             return res
         else:
+            print "here2"
             return self.calc_item(item)
 
     @property
