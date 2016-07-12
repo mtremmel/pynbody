@@ -76,6 +76,7 @@ class HaloCatalogue(object):
     def calc_item(self, i):
         if i in self._halos:  # and self._halos[i]() is not None :
             print "here3"
+            print i
             return self._halos[i]  # ()
         else:
             print "here4"
