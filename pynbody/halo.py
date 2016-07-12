@@ -75,11 +75,8 @@ class HaloCatalogue(object):
 
     def calc_item(self, i):
         if i in self._halos:  # and self._halos[i]() is not None :
-            print "here3"
-            print i
             return self._halos[i]  # ()
         else:
-            print "here4"
             h = self._get_halo(i)
             self._halos[i] = h  # weakref.ref(h)
             return h
@@ -92,13 +89,11 @@ class HaloCatalogue(object):
 
     def __getitem__(self, item):
         if isinstance(item, slice):
-            print "here"
             for x in self._halo_generator(item.start,item.stop) : pass
             indices = item.indices(len(self._halos))
             res = [self.calc_item(i) for i in range(*indices)]
             return res
         else:
-            print "here2"
             return self.calc_item(item)
 
     @property
@@ -898,7 +893,7 @@ class AHFCatalogue(HaloCatalogue):
             i = self._sorted_indices[item-1]
         else:
             i = item
-        super(AHFCatalogue,self).__getitem__(i)
+        return super(AHFCatalogue,self).__getitem__(i)
 
     def make_grp(self, name='grp'):
         """
