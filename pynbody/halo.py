@@ -893,7 +893,7 @@ class AHFCatalogue(HaloCatalogue):
             i = self._sorted_indices[item]
         else:
             i = item
-        super(AHFCatalogue,self).__getitem__(i)
+        super(AHFCatalogue,self).__getitem__(self,i)
 
     def make_grp(self, name='grp'):
         """
