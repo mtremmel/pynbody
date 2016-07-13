@@ -996,7 +996,7 @@ class AHFCatalogue(HaloCatalogue):
                     data[np.where(hi_mask)] -= nds
                     data[np.where(~hi_mask)] += ng
                 else:
-                    st_mask = (data >= nd) and (data < nd+ns)
+                    st_mask = (data >= nd) & (data < nd+ns)
                     data[np.where(st_mask)] += ng
                     g_mask = data >= nd+ns
                     data[np.where(g_mask)] -= ns
