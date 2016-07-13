@@ -967,7 +967,10 @@ class AHFCatalogue(HaloCatalogue):
     def _load_ahf_particle_block(self, f):
         """Load the particles for the next halo described in particle file f"""
         ng = len(self.base.gas)
-        nds = len(self.base.dark) + len(self.base.star)
+        #nds = len(self.base.dark) + len(self.base.star)
+        nd = len(self.base.dark)
+        ns = len(self.base.star)
+        nds = nd+ns
         startline = f.readline()
         if len((startline.split()))==1:
             startline = f.readline()
@@ -992,6 +995,11 @@ class AHFCatalogue(HaloCatalogue):
                     hi_mask = data >= nds
                     data[np.where(hi_mask)] -= nds
                     data[np.where(~hi_mask)] += ng
+                else:
+                    st_mask = data >= nd and data <nd+ns
+                    data[np.where(st_mask)] += ng
+                    g_mask = data >= nd+ns
+                    data[np.where(g_mask)] -= ns
         else:
             if not isinstance(f, gzip.GzipFile):
                 data = np.fromfile(f, dtype=int, sep=" ", count=nparts)
