@@ -998,10 +998,17 @@ class AHFCatalogue(HaloCatalogue):
                     data[np.where(hi_mask)] -= nds
                     data[np.where(~hi_mask)] += ng
                 else:
-                    st_mask = (data >= nd) & (data < nds)
-                    data[np.where(st_mask)] += ng
-                    g_mask = data >= nds
-                    data[np.where(g_mask)] -= ns
+                    hi_mask = data >= nds
+                    data[np.where(hi_mask)] -= nds
+                    data[np.where(~hi_mask)] += ng
+                    o_mask = (data >= ng) & (data < nd+ng)
+                    data[np.where(o_mask)] -= ng
+                    q_mask = data < ng
+                    data[np.where(q_mask)] += nd
+                    #st_mask = (data >= nd) & (data < nds)
+                    #data[np.where(st_mask)] += ng
+                    #g_mask = data >= nds
+                    #data[np.where(g_mask)] -= ns
         else:
             if not isinstance(f, gzip.GzipFile):
                 data = np.fromfile(f, dtype=int, sep=" ", count=nparts)
