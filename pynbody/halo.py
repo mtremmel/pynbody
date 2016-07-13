@@ -992,10 +992,12 @@ class AHFCatalogue(HaloCatalogue):
                 data = self._iord_to_fpos[data]
             else:
                 if type(self.base) is not snapshot.nchilada.NchiladaSnap:
+                    print "here"
                     hi_mask = data >= nds
                     data[np.where(hi_mask)] -= nds
                     data[np.where(~hi_mask)] += ng
                 else:
+                    print "here 2"
                     st_mask = (data >= nd) & (data < nd+ns)
                     data[np.where(st_mask)] += ng
                     g_mask = data >= nd+ns
