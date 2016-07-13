@@ -987,8 +987,6 @@ class AHFCatalogue(HaloCatalogue):
                 data = np.zeros(nparts, dtype=int)
                 for i in xrange(nparts):
                     data[i] = int(f.readline().split()[0])
-                    if data[i] < 0: print "NO"
-                    if data[i] > nd+ns+ng: print "NO!"
 
             if self._use_iord:
                 data = self._iord_to_fpos[data]
