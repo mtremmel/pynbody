@@ -987,20 +987,20 @@ class AHFCatalogue(HaloCatalogue):
                 data = np.zeros(nparts, dtype=int)
                 for i in xrange(nparts):
                     data[i] = int(f.readline().split()[0])
+                    if data[i] < 0: print "NO"
+                    if data[i] > nd+ns+ng: print "NO!"
 
             if self._use_iord:
                 data = self._iord_to_fpos[data]
             else:
                 if type(self.base) is not snapshot.nchilada.NchiladaSnap:
-                    print "here"
                     hi_mask = data >= nds
                     data[np.where(hi_mask)] -= nds
                     data[np.where(~hi_mask)] += ng
                 else:
-                    print "here 2", nd, ns, ng
                     st_mask = (data >= nd) & (data < nds)
                     data[np.where(st_mask)] += ng
-                    g_mask = data >= nd+ns
+                    g_mask = data >= nds
                     data[np.where(g_mask)] -= ns
         else:
             if not isinstance(f, gzip.GzipFile):
