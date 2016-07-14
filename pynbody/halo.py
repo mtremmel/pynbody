@@ -957,8 +957,14 @@ class AHFCatalogue(HaloCatalogue):
         #else:
             #nhalos = self._nhalos
 
-        for h in xrange(i):
-            ids = self._load_ahf_particle_block(f)
+        for h in xrange(i-1):
+            sthalo = f.readline()
+            if len(sthalo.split())>1:
+                sthalo = f.readline()
+            npart = sthalo.split()[0]
+            for i in range(npart):
+                f.readline()
+        ids = self._load_ahf_particle_block(f)
 
         f.close()
 
