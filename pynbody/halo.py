@@ -958,16 +958,16 @@ class AHFCatalogue(HaloCatalogue):
         #else:
             #nhalos = self._nhalos
         nskip = 0
-        for h in xrange(i-1):
-            stline = f.readline()
-            if len(stline.split())==1:
-                stline = f.readline()
-            if int(stline.split()[0]) != self._halos[h+1].properties['npart']:
-                print "UH OH"
+        #for h in xrange(i-1):
+        #    stline = f.readline()
+        #    if len(stline.split())==1:
+        #        stline = f.readline()
             #if not isinstance(f, gzip.GzipFile):
             #    np.fromfile(f, sep=" ", count=self._halos[h+1].properties['npart'] * 2)
-            for nn in xrange(self._halos[h+1].properties['npart']):
-                f.readline()
+        #    for nn in xrange(self._halos[h+1].properties['npart']):
+         #       f.readline()
+        fpos = self._halos[i].properties['fstart']
+        f.seek(fpos,0)
         ids = self._load_ahf_particle_block(f)
 
         #    sthalo = f.readline()
