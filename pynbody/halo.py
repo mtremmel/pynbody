@@ -969,7 +969,7 @@ class AHFCatalogue(HaloCatalogue):
          #       f.readline()
         fpos = self._halos[i].properties['fstart']
         f.seek(fpos,0)
-        ids = self._load_ahf_particle_block(f, npart=self._halos[i].properties['npart'])
+        ids = self._load_ahf_particle_block(f, nparts=self._halos[i].properties['npart'])
 
         #    sthalo = f.readline()
         #    if len(sthalo.split())<2:
