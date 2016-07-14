@@ -962,8 +962,8 @@ class AHFCatalogue(HaloCatalogue):
             if len(sthalo.split())>1:
                 sthalo = f.readline()
             npart = int(sthalo.split()[0])
-            for i in range(npart):
-                f.readline()
+            if not isinstance(f, gzip.GzipFile):
+                np.fromfile(f, dtype=int, sep=" ", count=npart * 2).reshape(npart, 2)
         ids = self._load_ahf_particle_block(f)
 
         f.close()
