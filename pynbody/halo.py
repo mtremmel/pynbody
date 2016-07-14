@@ -969,7 +969,7 @@ class AHFCatalogue(HaloCatalogue):
          #       f.readline()
         fpos = self._halos[i].properties['fstart']
         f.seek(fpos,0)
-        ids = self._load_ahf_particle_block(f)
+        ids = self._load_ahf_particle_block(f, npart=self._halos[i].properties['npart'])
 
         #    sthalo = f.readline()
         #    if len(sthalo.split())<2:
@@ -995,18 +995,17 @@ class AHFCatalogue(HaloCatalogue):
         f.close()
 
 
-    def _load_ahf_particle_block(self, f):
+    def _load_ahf_particle_block(self, f, nparts=None):
         """Load the particles for the next halo described in particle file f"""
         ng = len(self.base.gas)
-        #nds = len(self.base.dark) + len(self.base.star)
         nd = len(self.base.dark)
         ns = len(self.base.star)
         nds = nd+ns
-        startline = f.readline()
-        if len((startline.split()))==1:
+        if nparts is None:
             startline = f.readline()
-        #nparts = int(f.readline().split()[0])
-        nparts = int(startline.split()[0])
+            if len((startline.split()))==1:
+                startline = f.readline()
+            nparts = int(startline.split()[0])
 
         if self.isnew:
             if not isinstance(f, gzip.GzipFile):
