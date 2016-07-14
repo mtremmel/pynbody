@@ -797,7 +797,7 @@ class AHFCatalogue(HaloCatalogue):
     Class to handle catalogues produced by Amiga Halo Finder (AHF).
     """
 
-    def __init__(self, sim, make_grp=None, dummy=False, use_iord=None, ahf_basename=None, dosort=None):
+    def __init__(self, sim, make_grp=None, dummy=True, use_iord=None, ahf_basename=None, dosort=True, only_stat=False):
         """Initialize an AHFCatalogue.
 
         **kwargs** :
@@ -865,7 +865,8 @@ class AHFCatalogue(HaloCatalogue):
 
         self._load_ahf_halos(self._ahfBasename + 'halos')
 
-        self._get_file_positions(self._ahfBasename + 'particles')
+        if only_stat is None:
+            self._get_file_positions(self._ahfBasename + 'particles')
 
         if dosort is not None:
             nparr = np.array([self._halos[i+1].properties['npart'] for i in range(self._nhalos)])
