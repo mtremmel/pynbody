@@ -958,13 +958,13 @@ class AHFCatalogue(HaloCatalogue):
             #nhalos = self._nhalos
         nskip = 0
         for h in xrange(i-1):
-            stline = next(f)
+            stline = f.readline()
             if len(stline.split())==1:
-                stline = next(f)
+                stline = f.readline()
             if int(stline.split()[0]) != self._halos[h+1].properties['npart']:
                 print "UH OH"
             for nn in xrange(self._halos[h+1].properties['npart']):
-                next(f)
+                f.readline()
         ids = self._load_ahf_particle_block(f)
 
         #    sthalo = f.readline()
@@ -986,9 +986,9 @@ class AHFCatalogue(HaloCatalogue):
         nd = len(self.base.dark)
         ns = len(self.base.star)
         nds = nd+ns
-        startline = next(f)
+        startline = f.readline()
         if len((startline.split()))==1:
-            startline = next(f)
+            startline = f.readline()
         #nparts = int(f.readline().split()[0])
         nparts = int(startline.split()[0])
 
@@ -1001,7 +1001,7 @@ class AHFCatalogue(HaloCatalogue):
                 # seem to be an efficient way to load nparts lines
                 data = np.zeros(nparts, dtype=int)
                 for i in xrange(nparts):
-                    data[i] = int(next(f).split()[0])
+                    data[i] = int(f.readline().split()[0])
 
             if self._use_iord:
                 data = self._iord_to_fpos[data]
@@ -1022,7 +1022,7 @@ class AHFCatalogue(HaloCatalogue):
                 # see comment above on gzipped files
                 data = np.zeros(nparts, dtype=int)
                 for i in xrange(nparts):
-                    data[i] = int(next(f))
+                    data[i] = int(f.readline())
         data.sort()
         return data
 
