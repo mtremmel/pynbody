@@ -860,6 +860,7 @@ class AHFCatalogue(HaloCatalogue):
         logger.info("AHFCatalogue loading particles")
 
         self._load_ahf_particles(self._ahfBasename + 'particles')
+        self._get_file_positions(self._ahfBasename + 'particles')
 
         logger.info("AHFCatalogue loading halos")
 
@@ -980,6 +981,18 @@ class AHFCatalogue(HaloCatalogue):
         f.close()
 
         return load(self.base.filename, take=ids)
+
+    def _get_file_positions(self,filename):
+        f = util.open_(filename)
+        for h in xrange(self.nhalos):
+            startline = f.readline()
+            if len((startline.split()))==1:
+                startline = f.readline()
+            self._halos[h+1].properties['fstart'] = f.tell()
+            for i in xrange(self._halos[h+1].properties['npart']):
+                f.readline()
+        f.close()
+
 
     def _load_ahf_particle_block(self, f):
         """Load the particles for the next halo described in particle file f"""
