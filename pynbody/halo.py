@@ -984,7 +984,7 @@ class AHFCatalogue(HaloCatalogue):
 
     def _get_file_positions(self,filename):
         f = util.open_(filename)
-        for h in xrange(self.nhalos):
+        for h in xrange(self._nhalos):
             startline = f.readline()
             if len((startline.split()))==1:
                 startline = f.readline()
