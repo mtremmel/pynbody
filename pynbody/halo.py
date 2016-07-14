@@ -958,7 +958,9 @@ class AHFCatalogue(HaloCatalogue):
             #nhalos = self._nhalos
         nskip = 0
         for h in xrange(i-1):
-            next(f)
+            line = next(f)
+            if len(line.split())==1:
+                next(f)
             for i in range(self._halos[h+1].properties['npart']):
                 next(f)
         ids = self._load_ahf_particle_block(f)
