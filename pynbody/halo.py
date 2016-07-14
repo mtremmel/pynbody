@@ -959,7 +959,7 @@ class AHFCatalogue(HaloCatalogue):
 
         for h in xrange(i-1):
             sthalo = f.readline()
-            if len(sthalo.split())>1:
+            if len(sthalo.split())<2:
                 sthalo = f.readline()
             npart = int(sthalo.split()[0])
             if not isinstance(f, gzip.GzipFile):
