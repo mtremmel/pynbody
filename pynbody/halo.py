@@ -860,11 +860,12 @@ class AHFCatalogue(HaloCatalogue):
         logger.info("AHFCatalogue loading particles")
 
         self._load_ahf_particles(self._ahfBasename + 'particles')
-        self._get_file_positions(self._ahfBasename + 'particles')
 
         logger.info("AHFCatalogue loading halos")
 
         self._load_ahf_halos(self._ahfBasename + 'halos')
+
+        self._get_file_positions(self._ahfBasename + 'particles')
 
         if dosort is not None:
             nparr = np.array([self._halos[i+1].properties['npart'] for i in range(self._nhalos)])
