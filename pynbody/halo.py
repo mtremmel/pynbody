@@ -982,9 +982,9 @@ class AHFCatalogue(HaloCatalogue):
         nd = len(self.base.dark)
         ns = len(self.base.star)
         nds = nd+ns
-        startline = f.readline()
+        startline = next(f)
         if len((startline.split()))==1:
-            startline = f.readline()
+            startline = next(f)
         #nparts = int(f.readline().split()[0])
         nparts = int(startline.split()[0])
 
@@ -997,7 +997,7 @@ class AHFCatalogue(HaloCatalogue):
                 # seem to be an efficient way to load nparts lines
                 data = np.zeros(nparts, dtype=int)
                 for i in xrange(nparts):
-                    data[i] = int(f.readline().split()[0])
+                    data[i] = int(next(f).split()[0])
 
             if self._use_iord:
                 data = self._iord_to_fpos[data]
@@ -1018,7 +1018,7 @@ class AHFCatalogue(HaloCatalogue):
                 # see comment above on gzipped files
                 data = np.zeros(nparts, dtype=int)
                 for i in xrange(nparts):
-                    data[i] = int(f.readline())
+                    data[i] = int(next(f))
         data.sort()
         return data
 
