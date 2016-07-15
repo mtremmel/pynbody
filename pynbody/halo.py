@@ -921,7 +921,7 @@ class AHFCatalogue(HaloCatalogue):
                 print "getting stars!", len(target)
             if family == "gas" or family == "Gas" or family == "g":
                 target = self.base.gas
-            if family == "black holes" or family == "Black Holes" or family == "BH":
+            if family == "black holes" or family == "Black Holes" or family == "BH" or family == "bh":
                 temptarget = self.base.star
                 target = temptarget[(temptarget['tform']<0)]
 
@@ -958,24 +958,24 @@ class AHFCatalogue(HaloCatalogue):
             if family is None:
                 ar[ids] = hcnt[cnt]
             else:
-                if target == self.base.star:
+                if family in ["star", "Star", "s"]:
                     t_mask = ids > nd + ng
                     id_t = ids[np.where(t_mask)] - (nd+ng)
-                if target == self.base.gas:
+                if family in ["gas", "Gas", "g"]:
                     if type(self.base) is not snapshot.nchilada.NchiladaSnap:
                         t_mask = ids < ng
                         id_t = ids[np.where(t_mask)]
                     else:
                         t_mask = (ids >= nd) & (ids < nd+ng)
                         id_t = ids[np.where(t_mask)] - nd
-                if target == self.base.dark:
+                if family in ["Dark", "dark", "dm"]:
                     if type(self.base) is not snapshot.nchilada.NchiladaSnap:
                         t_mask = (ids >= ng) & (ids < ng+nd)
                         id_t = ids[np.where(t_mask)] - ng
                     else:
                         t_mask = (ids < nd)
                         id_t = ids[np.where(t_mask)]
-                if family == "black holes" or family == "Black Holes" or family == "BH":
+                if family in ["black holes","Black Holes","BH", "bh"]:
                     fpos_ar = target.get_index_list(self.base)
                     id_t, = np.where(np.in1d(fpos_ar, ids))
 
