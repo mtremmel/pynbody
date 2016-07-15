@@ -918,6 +918,7 @@ class AHFCatalogue(HaloCatalogue):
                 target = self.base.dark
             if family == "star" or family == "Star" or family == "s":
                 target = self.base.star
+                print "getting stars!", len(target)
             if family == "gas" or family == "Gas" or family == "g":
                 target = self.base.gas
             if family == "black holes" or family == "Black Holes" or family == "BH":
@@ -931,6 +932,7 @@ class AHFCatalogue(HaloCatalogue):
             hcnt = self._sorted_indices
 
         else:
+            print "setting hcnt"
             hcnt = np.arange(len(self._sorted_indices)) + 1
 
         if top_level is False:
@@ -944,7 +946,10 @@ class AHFCatalogue(HaloCatalogue):
 
         cnt = 0
         ar = np.ones(len(target))*-1
-        for halo in [self._halos[i] for i in hord]:
+        print "just set the array", len(ar)
+        for i in hord:
+            halo = self._halos[i]
+            if cnt%100: print float(cnt)/float(len(hord)) * 100, '%'
             if self._dummy is None:
                 ids = halo.get_index_list(self.base)
             else:
@@ -955,21 +960,21 @@ class AHFCatalogue(HaloCatalogue):
             else:
                 if target == self.base.star:
                     t_mask = ids > nd + ng
-                    id_t = ids[t_mask] - (nd+ng)
+                    id_t = ids[np.where(t_mask)] - (nd+ng)
                 if target == self.base.gas:
                     if type(self.base) is not snapshot.nchilada.NchiladaSnap:
                         t_mask = ids < ng
-                        id_t = ids[t_mask]
+                        id_t = ids[np.where(t_mask)]
                     else:
                         t_mask = (ids >= nd) & (ids < nd+ng)
-                        id_t = ids[t_mask] - nd
+                        id_t = ids[np.where(t_mask)] - nd
                 if target == self.base.dark:
                     if type(self.base) is not snapshot.nchilada.NchiladaSnap:
                         t_mask = (ids >= ng) & (ids < ng+nd)
-                        id_t = ids[t_mask] - ng
+                        id_t = ids[np.where(t_mask)] - ng
                     else:
                         t_mask = (ids < nd)
-                        id_t = ids[t_mask]
+                        id_t = ids[np.where(t_mask)]
                 if family == "black holes" or family == "Black Holes" or family == "BH":
                     fpos_ar = target.get_index_list(self.base)
                     id_t, = np.where(np.in1d(fpos_ar, ids))
