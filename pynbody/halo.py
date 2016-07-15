@@ -970,7 +970,7 @@ class AHFCatalogue(HaloCatalogue):
                     else:
                         t_mask = (ids < nd)
                         id_t = ids[t_mask]
-                if family is in ["BH", "Black Holes", "black holes"]:
+                if family == "black holes" or family == "Black Holes" or family == "BH":
                     fpos_ar = target.get_index_list(self.base)
                     id_t, = np.where(np.in1d(fpos_ar, ids))
 
