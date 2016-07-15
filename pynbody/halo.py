@@ -26,6 +26,7 @@ import gzip
 import logging
 from . import snapshot, util, config, config_parser, units
 from .snapshot import gadget
+import gc
 
 logger = logging.getLogger("pynbody.halo")
 
@@ -905,15 +906,76 @@ class AHFCatalogue(HaloCatalogue):
         """
         self.base[name] = self.get_group_array()
 
-    def get_group_array(self, top_level=False):
-        ar = np.zeros(len(self.base), dtype=int)
-        if top_level is False:
-            for halo in self._halos.values():
-                ar[halo.get_index_list(self.base)] = halo._halo_id
+    def get_group_array(self, top_level=False, family=None):
+        nd = len(self.base.dark)
+        ns = len(self.base.star)
+        ng = len(self.base.gas)
+        if family is None:
+            target = self.base
+        else:
+
+            if family == "dark" or family == "Dark" or family == "dm":
+                target = self.base.dark
+            if family == "star" or family == "Star" or family == "s":
+                target = self.base.star
+            if family == "gas" or family == "Gas" or family == "g":
+                target = self.base.gas
+            if family == "black holes" or family = "Black Holes" or family = "BH":
+                temptarget = self.base.star
+                target = temptarget[(temptarget['tform']<0)]
+
+        if self._dosort is None:
+            nparr = np.array([self._halos[i+1].properties['npart'] for i in range(self._nhalos)])
+            osort = np.argsort(nparr)[::-1]
+            self._sorted_indices = osort + 1
+            hcnt = self._sorted_indices
 
         else:
-            for halo in self._halos.values()[::-1]:
-                ar[halo.get_index_list(self.base)] = halo._halo_id
+            hcnt = np.arange(len(self._sorted_indices)) + 1
+
+        if top_level is False:
+            hord = self._sorted_indices
+        else:
+            hord = self._sorted_indices[::-1]
+            hcnt = hcnt[::-1]
+
+        if self._dummy is not None:
+            f = util.open_(self._ahfBasename+'particles')
+
+        cnt = 0
+        ar = np.ones(len(target))*-1
+        for halo in [self._halos[i] for i in hord]:
+            if self._dummy is None:
+                ids = halo.get_index_list(self.base)
+            else:
+                f.seek(halo.properties['fstart'],0)
+                ids = self._load_ahf_particle_block(f,halo.properties['npart'])
+            if family is None:
+                ar[ids] = hcnt[cnt]
+            else:
+                if target == self.base.star:
+                    t_mask = ids > nd + ng
+                    id_t = ids[t_mask] - (nd+ng)
+                if target == self.base.gas:
+                    if type(self.base) is not snapshot.nchilada.NchiladaSnap:
+                        t_mask = ids < ng
+                        id_t = ids[t_mask]
+                    else:
+                        t_mask = (ids >= nd) & (ids < nd+ng)
+                        id_t = ids[t_mask] - nd
+                if target == self.base.dark:
+                    if type(self.base) is not snapshot.nchilada.NchiladaSnap:
+                        t_mask = (ids >= ng) & (ids < ng+nd)
+                        id_t = ids[t_mask] - ng
+                    else:
+                        t_mask = (ids < nd)
+                        id_t = ids[t_mask]
+                if family is in ["BH", "Black Holes", "black holes"]:
+                    fpos_ar = target.get_index_list(self.base)
+                    id_t, = np.where(np.in1d(fpos_ar, ids))
+
+                ar[id_t] = hcnt[cnt]
+            cnt += 1
         return ar
 
     def _setup_children(self):
