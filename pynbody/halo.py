@@ -947,9 +947,10 @@ class AHFCatalogue(HaloCatalogue):
         cnt = 0
         ar = np.ones(len(target))*-1
         print "just set the array", len(ar)
+        print hord
         for i in hord:
             halo = self._halos[i]
-            if cnt%100: print float(cnt)/float(len(hord)) * 100, '%'
+            if cnt%100 == 0: print float(cnt)/float(len(hcnt)), '% done'
             if self._dummy is None:
                 ids = halo.get_index_list(self.base)
             else:
