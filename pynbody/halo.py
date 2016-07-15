@@ -920,7 +920,7 @@ class AHFCatalogue(HaloCatalogue):
                 target = self.base.star
             if family == "gas" or family == "Gas" or family == "g":
                 target = self.base.gas
-            if family == "black holes" or family = "Black Holes" or family = "BH":
+            if family == "black holes" or family == "Black Holes" or family == "BH":
                 temptarget = self.base.star
                 target = temptarget[(temptarget['tform']<0)]
 
