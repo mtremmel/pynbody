@@ -805,7 +805,7 @@ class AHFCatalogue(HaloCatalogue):
     """
 
     def __init__(self, sim, make_grp=None, get_all_parts=None, use_iord=None, ahf_basename=None,
-                 dosort=False, only_stat=None, write_fpos=True, **kwargs):
+                 dosort=True, only_stat=None, write_fpos=True, **kwargs):
         """Initialize an AHFCatalogue.
 
         **kwargs** :
