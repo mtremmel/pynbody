@@ -805,7 +805,7 @@ class AHFCatalogue(HaloCatalogue):
     """
 
     def __init__(self, sim, make_grp=None, get_all_parts=None, use_iord=None, ahf_basename=None,
-                 dosort=True, only_stat=None, write_fpos=True, **kwargs):
+                 dosort=False, only_stat=None, write_fpos=True, **kwargs):
         """Initialize an AHFCatalogue.
 
         **kwargs** :
@@ -1021,7 +1021,7 @@ class AHFCatalogue(HaloCatalogue):
 
                 ar[id_t] = hcnt[cnt]
             cnt += 1
-        return ar
+        return ar.astype(np.int)
 
     def _setup_children(self):
         """
