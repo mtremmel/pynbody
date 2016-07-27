@@ -1021,7 +1021,7 @@ class AHFCatalogue(HaloCatalogue):
 
                 ar[id_t] = hcnt[cnt]
             cnt += 1
-        return ar
+        return ar.astype(np.int)
 
     def _setup_children(self):
         """
