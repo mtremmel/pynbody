@@ -970,7 +970,6 @@ class AHFCatalogue(HaloCatalogue):
             hcnt = self._sorted_indices
 
         else:
-            print "setting hcnt"
             hcnt = np.arange(len(self._sorted_indices)) + 1
 
         if top_level is False:
@@ -984,12 +983,9 @@ class AHFCatalogue(HaloCatalogue):
 
         cnt = 0
         ar = np.ones(len(target))*-1
-        print "just set the array", len(ar)
         print hord
         for i in hord:
             halo = self._halos[i]
-            if cnt%100 == 0: print float(cnt)/float(len(hcnt)), '% done'
-
             if self._all_parts is not None:
                 ids = halo.get_index_list(self.base)
             else:
