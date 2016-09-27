@@ -780,7 +780,7 @@ class TipsySnap(SimSnap):
         specified name. If fam is not None, read only the particles of
         the specified family."""
 
-        if filename is None and array_name in ['massform', 'rhoform', 'tempform', 'phiform', 'nsmooth',
+        if filename is None and array_name in ['rhoform', 'tempform', 'phiform', 'nsmooth',
                                                'xform', 'yform', 'zform', 'vxform', 'vyform', 'vzform',
                                                'posform', 'velform','h2form','tcoolform']:
 

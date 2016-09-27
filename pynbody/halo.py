@@ -805,7 +805,7 @@ class AHFCatalogue(HaloCatalogue):
     """
 
     def __init__(self, sim, make_grp=None, get_all_parts=None, use_iord=None, ahf_basename=None,
-                 dosort=True, only_stat=None, write_fpos=True, **kwargs):
+                 dosort=None, only_stat=None, write_fpos=True, **kwargs):
         """Initialize an AHFCatalogue.
 
         **kwargs** :
@@ -983,7 +983,6 @@ class AHFCatalogue(HaloCatalogue):
 
         cnt = 0
         ar = np.ones(len(target))*-1
-        print hord
         for i in hord:
             halo = self._halos[i]
             if self._all_parts is not None:
@@ -995,7 +994,7 @@ class AHFCatalogue(HaloCatalogue):
                 ar[ids] = hcnt[cnt]
             else:
                 if family in ["star", "Star", "s"]:
-                    t_mask = ids > nd + ng
+                    t_mask = ids >= nd + ng
                     id_t = ids[np.where(t_mask)] - (nd+ng)
                 if family in ["gas", "Gas", "g"]:
                     if type(self.base) is not snapshot.nchilada.NchiladaSnap:
@@ -1017,6 +1016,8 @@ class AHFCatalogue(HaloCatalogue):
 
                 ar[id_t] = hcnt[cnt]
             cnt += 1
+        if self._all_parts is None:
+            f.close()
         return ar.astype(np.int)
 
     def _setup_children(self):
