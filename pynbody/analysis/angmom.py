@@ -127,7 +127,6 @@ def sideon(h, vec_to_xform=calc_sideon_matrix, cen_size="1 kpc",
     if (len(h.gas[filt.Sphere(disk_size)]) > 100):
         cen = h.gas[filt.Sphere(disk_size)]
     else:
-	print "not enough gas!"
         cen = h[filt.Sphere(disk_size)]
 
     logger.info("Calculating angular momentum vector...")
