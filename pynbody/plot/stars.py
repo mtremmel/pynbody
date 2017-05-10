@@ -229,10 +229,12 @@ def sfh(sim, filename=None, massform=True, clear=False, legend=False,
 
     '''
 
+    import matplotlib.pyplot as pyplot
+
     if subplot:
         plt = subplot
     else:
-        import matplotlib.pyplot as plt
+        plt = pyplot
 
     if "nbins" in kwargs:
         bins = kwargs['nbins']
@@ -288,17 +290,18 @@ def sfh(sim, filename=None, massform=True, clear=False, legend=False,
     # add a z axis on top if it has not been already done by an earlier plot:
     from pynbody.analysis import pkdgrav_cosmo as cosmo
     c = cosmo.Cosmology(sim=sim)
-    old_axis = plt.gca()
 
-    if len(plt.gcf().axes)<2:
-        pz = plt.twiny()
-        labelzs = np.arange(5, int(sim.properties['z']) - 1, -1)
-        times = [13.7 * c.Exp2Time(1.0 / (1 + z)) / c.Exp2Time(1) for z in labelzs]
-        pz.set_xticks(times)
-        pz.set_xticklabels([str(x) for x in labelzs])
-        pz.set_xlim(x0, x1)
-        pz.set_xlabel('$z$')
-        plt.sca(old_axis)
+    old_axis = pyplot.gca()
+
+    pz = plt.twiny()
+    labelzs = np.arange(5, int(sim.properties['z']) - 1, -1)
+    times = [13.7 * c.Exp2Time(1.0 / (1 + z)) / c.Exp2Time(1) for z in labelzs]
+    pz.set_xticks(times)
+    pz.set_xticklabels([str(x) for x in labelzs])
+    pz.set_xlim(x0, x1)
+    pz.set_xlabel('$z$')
+
+    pyplot.sca(old_axis)
 
     if legend:
         plt.legend(loc=1)
@@ -737,6 +740,51 @@ def behroozi(xmasses, z, alpha=-1.412, Kravtsov=False):
 
     return 10 ** smp, 10 ** scatter
 
+
+def hudson(xmasses, z):
+    ''' Based on Hudson+ (2014), returns what stellar mass corresponds to the 
+    halo mass passed in.  This is the only SMHMR function that is not based
+    on abundance matching, but instead uses date from CFHTLenS galaxy lensing data.
+       >>> from pynbody.plot.stars import hudson
+       >>> xmasses = np.logspace(np.log10(min(totmasshalos)),1+np.log10(max(totmasshalos)),20)
+       >>> ystarmasses, errors = hudson(xmasses,halo_catalog._halos[1].properties['z'])
+       >>> plt.fill_between(xmasses,np.array(ystarmasses)/np.array(errors),
+                         y2=np.array(ystarmasses)*np.array(errors),
+                         facecolor='#BBBBBB',color='#BBBBBB')
+    '''
+    f05 = 0.0414
+    f05_err = 0.0024
+    fz = 0.029
+    fz_err = 0.009
+    log10M05 = 12.07
+    log10M05_err = 0.07
+    Mz = 0.09
+    Mz_err = 0.24
+    beta = 0.69
+    beta_err = 0.09
+    gamma = 0.8
+    
+    f1 = f05 + (z-0.5)*fz
+    f1_err = np.sqrt(f05_err**2+(z-0.5)**2*fz_err**2)
+    
+    M1_exp = (log10M05+(z-0.5)*Mz) 
+    M1_exp_err = np.sqrt(log10M05_err**2+(z-0.5)**2*Mz_err**2)
+    
+    M1 = np.power(10, M1_exp)
+    M1_err = np.abs(M1*np.log(10)*M1_exp_err)
+    
+    beta_term = np.power(xmasses/M1, -beta)
+    beta_term_err = np.sqrt((beta/M1*M1_err/M1**2)**2 + (np.log(M1)*beta_err)**2)
+    
+    gamma_term = np.power(xmasses/M1, gamma)
+    gamma_term_err = np.abs(gamma_term*gamma*M1_err/M1**3)
+    
+    fstar_denom = beta_term + gamma_term
+    fstar_denom_err = np.sqrt(beta_term*2+ gamma_term**2)
+    
+    fstar = 2.0*f1/fstar_denom
+    fstar_err = np.sqrt((f1_err/f1)**2 + (fstar_denom_err/fstar_denom)**2)
+    return fstar*xmasses, 2.0/fstar_err
 
 def moster(xmasses, z):
     '''Based on Moster+ (2013) return what stellar mass corresponds to the
