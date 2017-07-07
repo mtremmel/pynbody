@@ -395,7 +395,7 @@ class SimSnap(object):
 
     def __remove_family_array_if_derived(self, name):
         if self.is_derived_array(name):
-            del self[name]
+            del self.ancestor[name]
 
 
     def __load_remaining_families_if_loadable(self, name):
@@ -801,9 +801,6 @@ class SimSnap(object):
             u = self.infer_original_units(u)
         return u
 
-    ############################################
-    # HALO CATALOGUES
-    ############################################
     def halos(self, *args, **kwargs):
         """Tries to instantiate a halo catalogue object for the given
         snapshot, using the first available method (as defined in the
@@ -827,10 +824,6 @@ class SimSnap(object):
 
         raise RuntimeError("No halo catalogue found for %r" % str(self))
 
-    ############################################
-    # BRIDGES
-    ############################################
-
     def bridge(self, other):
         """Tries to construct a bridge function between this SimSnap
         and another one.
@@ -842,6 +835,13 @@ class SimSnap(object):
         """
         from .. import bridge
         return bridge.bridge_factory(self, other)
+
+    def load_copy(self):
+        """Tries to load a copy of this snapshot, using partial loading to select
+        only a subset of particles corresponding to a given SubSnap"""
+        if getattr(self.ancestor,'partial_load',False):
+            raise NotImplementedError, "Cannot load a copy of data that was itself partial-loaded"
+        return load(self.ancestor.filename, take=self.get_index_list(self.ancestor))
 
     ############################################
     # HELPER FUNCTIONS FOR LAZY LOADING
