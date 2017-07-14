@@ -24,6 +24,7 @@ import sys
 from array import SimArray
 import gzip
 import logging
+import struct
 from . import snapshot, util, config, config_parser, units
 from .snapshot import gadget
 import gc
@@ -986,7 +987,8 @@ class AHFCatalogue(HaloCatalogue):
             f = util.open_(self._ahfBasename+'particles')
 
         cnt = 0
-        ar = np.ones(len(target))*-1
+        ar = np.empty(len(target),dtype=np.int32)
+        ar[:]=-1
         for i in hord:
             halo = self._halos[i]
             if self._all_parts is not None:
@@ -1007,7 +1009,6 @@ class AHFCatalogue(HaloCatalogue):
 
                 ar[id_t] = hcnt[cnt]
             cnt += 1
-
         return ar.astype(np.int)
 
     def _setup_children(self):
@@ -1099,6 +1100,7 @@ class AHFCatalogue(HaloCatalogue):
             if not isinstance(f, gzip.GzipFile):
                 data = (np.fromfile(
                     f, dtype=int, sep=" ", count=nparts * 2).reshape(nparts, 2))[:, 0]
+                data = np.ascontiguousarray(data)
             else:
                 # unfortunately with gzipped files there does not
                 # seem to be an efficient way to load nparts lines
@@ -1844,14 +1846,14 @@ class SubFindHDFHaloCatalogue(HaloCatalogue) :
             # Test if there are no remainders, i.e. array is multiple of halo length
             # then solve for the case where this is 1, 2 or 3 dimension
             if len(sub_properties[key]) % self.nsubhalos == 0:
-                ndim = len(sub_properties[key]) / self.nsubhalos
+                ndim = len(sub_properties[key]) // self.nsubhalos
                 if ndim > 1:
                     sub_properties[key] = sub_properties[key].reshape(self.nsubhalos, ndim)
 
             try:
                 # The case fof FOF
                 if len(fof_properties[key]) % self.ngroups == 0:
-                    ndim = len(fof_properties[key]) / self.ngroups
+                    ndim = len(fof_properties[key]) // self.ngroups
                     if ndim > 1:
                         fof_properties[key] = fof_properties[key].reshape(self.ngroups, ndim)
             except KeyError:
@@ -2080,6 +2082,26 @@ class SubFindHDFSubHalo(Halo) :
             self.properties[key] = SimArray(sub_props[key][absolute_id], sub_props[key].units)
             self.properties[key].sim = self.base
 
+
+
+class HOPCatalogue(GrpCatalogue):
+    """A HOP Catalogue as used by Ramses"""
+    def __init__(self, sim, fname=None):
+        self._halos = {}
+        if fname is None:
+            match = re.match("output_([0-9]*)",sim.filename)
+            if match is None:
+                raise RuntimeError("Cannot guess the HOP catalogue filename for %s"%sim.filename)
+            fname = "grp%s.tag"%match.group(1)
+
+        sim._create_array('hop_grp', dtype=np.int32)
+        sim['hop_grp']=-1
+        with open(fname, "rb") as f:
+            garbage, num_part, num_grps, _, _, _ = struct.unpack('iiiiii', f.read(24))
+            if num_part!=len(sim.dm):
+                raise RuntimeError("Mismatching number of particles between snapshot %s and HOP file %s"%(sim.filename, fname))
+            sim.dm['hop_grp'] = np.fromfile(f, np.int32, len(sim.dm))
+        GrpCatalogue.__init__(self,sim,array="hop_grp")
 
 
 def _get_halo_classes():
