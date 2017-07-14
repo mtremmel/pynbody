@@ -113,8 +113,9 @@ def velocity_image(sim, width="10 kpc", vector_color='black', edgecolor='black',
 
     width = float(width)
 
-    X, Y = np.meshgrid(np.arange(-width / 2, width / 2, width / vector_resolution),
-                       np.arange(-width / 2, width / 2, width / vector_resolution))
+    pixel_size = width / vector_resolution
+    X, Y = np.meshgrid(np.arange(-width / 2 + pixel_size/2, width / 2 + pixel_size/2, pixel_size ),
+                       np.arange(-width / 2 + pixel_size/2, width / 2 + pixel_size/2, pixel_size))
 
     im = image(sim, width=width, **kwargs)
 
@@ -132,8 +133,13 @@ def velocity_image(sim, width="10 kpc", vector_color='black', edgecolor='black',
     elif mode == 'stream' :
         Q = p.streamplot(X, Y, vx, vy, color=vector_color, density=density)
 
-    p.xlim(-width/2, width/2)
-    p.ylim(-width/2, width/2)
+	# RS - if a axis object is passed in, use the right limit call
+    if subplot:
+        p.set_xlim(-width/2, width/2)
+        p.set_ylim(-width/2, width/2)
+    else:
+        p.xlim(-width/2, width/2)
+        p.ylim(-width/2, width/2)
 
     return im
 
@@ -214,7 +220,7 @@ def volume(sim, qty='rho', width=None, resolution=200,
         ctf.add_rgb_point(vmin+(vmax-vmin)*0.8,200./255,178./255,164./255)
         ctf.add_rgb_point(vmin+(vmax-vmin)*0.9,1.0,210./255,149./255)
         ctf.add_rgb_point(vmax,1.0,222./255,141./255)
-        print vmin,vmax
+
         V._volume_property.set_color(ctf)
         V._ctf = ctf
         V.update_ctf = True
@@ -464,6 +470,7 @@ def image(sim, qty='rho', width="10 kpc", resolution=500, units=None, log=True,
             units = im.units
 
 
+        
         if units.latex() is "":
             units=""
         else:

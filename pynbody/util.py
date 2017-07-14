@@ -64,7 +64,7 @@ def gcf(a, b):
 
 
 def lcm(a, b):
-    return a * b / gcf(a, b)
+    return (a * b) // gcf(a, b)
 
 
 def intersect_slices(s1, s2, array_length=None):
@@ -624,7 +624,7 @@ def read_fortran(f, dtype, n=1):
 def skip_fortran(f, n=1):
     for i in xrange(n):
         alen = np.fromfile(f, _head_type, 1)
-        f.seek(alen, 1)
+        f.seek(alen[0], 1)
         alen2 = np.fromfile(f, _head_type, 1)
         assert alen == alen2
 
