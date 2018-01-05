@@ -172,7 +172,6 @@ class Bridge(object):
         assert len(restriction_end_indices) == len(
             restriction_start_indices), "Internal consistency failure in catalog_transfer_matrix: particles supposedly common to both simulations have two different lengths"
 
-
         if only_family is None:
 
 
