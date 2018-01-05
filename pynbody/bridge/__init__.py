@@ -163,24 +163,29 @@ class Bridge(object):
             end = end[use_family]
             start = start[use_family]
 
+        restricted_start_particles = self(self(start)) # map back and forth to get only particles that are held in common
+        restricted_end_particles = self(restricted_start_particles) # map back to start in case a reordering is required
+
+        restriction_end_indices = restricted_end_particles.get_index_list(end.ancestor)
+        restriction_start_indices = restricted_start_particles.get_index_list(start.ancestor)
+
+        assert len(restriction_end_indices) == len(
+            restriction_start_indices), "Internal consistency failure in catalog_transfer_matrix: particles supposedly common to both simulations have two different lengths"
+
 
         if only_family is None:
 
-            restriction_end = self(self(end)).get_index_list(end.ancestor)
-            restriction_start = self(self(start)).get_index_list(start.ancestor)
 
-            assert len(restriction_end) == len(
-                restriction_start), "Internal consistency failure in catalog_transfer_matrix: particles supposedly common to both simulations have two different lengths"
-            g1 = groups_1.get_group_array()[restriction_start]
-            g2 = groups_2.get_group_array()[restriction_end]
+            g1 = groups_1.get_group_array()[restriction_start_indices]
+            g2 = groups_2.get_group_array()[restriction_end_indices]
 
         else:
 
-            g1 = groups_1.get_group_array(family=only_family)
-            g2 = groups_2.get_group_array(family=only_family)
+            g1 = groups_1.get_group_array(family=only_family)[restriction_start_indices]
+            g2 = groups_2.get_group_array(family=only_family)[restriction_end_indices]
 
         if max_index is None:
-            max_index = max(g1.max(),g2.max())
+            max_index = max(len(groups_1), len(groups_2))
         if min_index is None:
             min_index = min(g1.min(),g2.min())
 
@@ -202,11 +207,12 @@ class OrderBridge(Bridge):
     failsafe option.
     """
 
-    def __init__(self, start, end, order_array="iord", monotonic=True):
+    def __init__(self, start, end, order_array="iord", monotonic=True, allow_family_change=False):
         self._start = weakref.ref(start)
         self._end = weakref.ref(end)
         self._order_array = order_array
         self.monotonic = monotonic
+        self.allow_family_change = allow_family_change
 
     def is_same(self, i1, i2):
 
@@ -237,10 +243,18 @@ class OrderBridge(Bridge):
             iord_to = iord_to[iord_map_to]
             iord_from = iord_from[iord_map_from]
 
-        output_index = _bridge.bridge(iord_to, iord_from)
+        output_index, found_match = _bridge.bridge(iord_to, iord_from)
 
         if not self.monotonic:
-            output_index = iord_map_to[output_index[np.argsort(iord_map_from)]]
+            output_index = iord_map_to[output_index[np.argsort(iord_map_from)][found_match]]
+        else:
+            output_index = output_index[found_match]
+
+        if self.allow_family_change:
+            new_family_index = to_._family_index()[output_index]
+
+            # stable sort by family:
+            output_index = output_index[np.lexsort((new_family_index,))]
 
         return to_[output_index]
 
@@ -262,7 +276,7 @@ def bridge_factory(a, b):
         else:
             return Bridge(a_top, b_top)
     elif isinstance(a_top, gadget.GadgetSnap) or isinstance(a_top, gadgethdf.GadgetHDFSnap):
-        return OrderBridge(a_top, b_top, monotonic=False)
+        return OrderBridge(a_top, b_top, monotonic=False, allow_family_change=True)
     elif isinstance(a_top, ramses.RamsesSnap):
         if len(a.gas) > 0 or len(b.gas) > 0:
             raise RuntimeError, "Cannot bridge AMR gas cells"
