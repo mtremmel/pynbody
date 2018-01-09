@@ -482,7 +482,7 @@ def image(sim, qty='rho', width="10 kpc", resolution=500, units=None, log=True,
             units = "$"+units.latex()+"$"
 
         if show_cbar:
-             plt.colorbar(ims).set_label(qtytitle+"/"+units)
+             plt.colorbar(ims).set_label(qtytitle+"["+units+"]")
 
         # colorbar doesn't work wtih subplot:  mappable is NoneType
         # elif show_cbar:
