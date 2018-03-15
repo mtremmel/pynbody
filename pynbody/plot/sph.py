@@ -141,7 +141,7 @@ def velocity_image(sim, width="10 kpc", vector_color='black', edgecolor='black',
         p.xlim(-width/2, width/2)
         p.ylim(-width/2, width/2)
 
-    return im
+    return im, Q
 
 
 def volume(sim, qty='rho', width=None, resolution=200,
@@ -482,7 +482,7 @@ def image(sim, qty='rho', width="10 kpc", resolution=500, units=None, log=True,
             units = "$"+units.latex()+"$"
 
         if show_cbar:
-             plt.colorbar(ims).set_label(qtytitle+"/"+units)
+             plt.colorbar(ims).set_label(qtytitle+"["+units+"]")
 
         # colorbar doesn't work wtih subplot:  mappable is NoneType
         # elif show_cbar:
