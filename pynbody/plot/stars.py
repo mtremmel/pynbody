@@ -81,7 +81,7 @@ def render(sim, filename=None,
 		   width=50,
 		   starsize=None,
 		   plot=True, axes=None, ret_im=False, clear=True,
-		   ret_range=False, with_dust=False, z_range=50.0):
+		   ret_range=False, with_dust=False, z_range=50.0, resolution=500):
 	'''
 	Make a 3-color image of stars.
 
@@ -160,11 +160,11 @@ def render(sim, filename=None,
 		sim.s[smf]['smooth'] = array.SimArray(starsize, 'kpc', sim=sim)
 
 	r = image(sim.s, qty=r_band + '_lum_den', width=width, log=False,
-			  units="pc^-2", clear=False, noplot=True) * r_scale
+			  units="pc^-2", clear=False, noplot=True, resolution=resolution) * r_scale
 	g = image(sim.s, qty=g_band + '_lum_den', width=width, log=False,
-			  units="pc^-2", clear=False, noplot=True) * g_scale
+			  units="pc^-2", clear=False, noplot=True, resolution=resolution) * g_scale
 	b = image(sim.s, qty=b_band + '_lum_den', width=width, log=False,
-			  units="pc^-2", clear=False, noplot=True) * b_scale
+			  units="pc^-2", clear=False, noplot=True, resolution=resolution) * b_scale
 
 	# convert all channels to mag arcsec^-2
 
