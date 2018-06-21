@@ -157,14 +157,18 @@ class AHFCatalogue(HaloCatalogue):
         target = None
         famslice = None
 
+        fam_names = [ff.name for ff in self.base.famlies()]
+
         if family is None:
             target = self.base
         else:
-            if family in ['gas','star','dm']:
+            if family in fam_names:
                 famslice = self.base._get_family_slice(family)
                 target = self.base[famslice]
             else:
-                if family == 'bh':
+                if family in self.base.families():
+                   target = self.base[family]
+                elif family == 'bh':
                     temptarget = self.base.star
                     target = temptarget[(temptarget['tform']<0)]
 
