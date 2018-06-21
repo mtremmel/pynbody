@@ -157,7 +157,7 @@ class AHFCatalogue(HaloCatalogue):
         target = None
         famslice = None
 
-        fam_names = [ff.name for ff in self.base.famlies()]
+        fam_names = [ff.name for ff in self.base.families()]
 
         if family is None:
             target = self.base
