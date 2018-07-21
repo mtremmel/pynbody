@@ -55,7 +55,7 @@ def combine(r, g, b, magnitude_range, brightest_mag=None, mollview=False):
 				ordered = np.sort(x_tmp.data)
 			else:   
 				ordered = np.sort(x.flatten())
-			brightest_mag.append(ordered[-len(ordered) / 5000])
+			brightest_mag.append(ordered[-len(ordered) // 5000])
 
 		brightest_mag = max(brightest_mag)
 	else:
@@ -79,6 +79,7 @@ def render(sim, filename=None,
 		   dynamic_range=2.0,
 		   mag_range=None,
 		   width=50,
+		   resolution=500,
 		   starsize=None,
 		   plot=True, axes=None, ret_im=False, clear=True,
 		   ret_range=False, with_dust=False, z_range=50.0, resolution=500):
@@ -116,6 +117,9 @@ def render(sim, filename=None,
 
 	   *width*: float in kpc (default:50)
 		 Sets the size of the image field in kpc
+
+	   *resolution*: integer (default: 500)
+	     Sets the number of pixels on the side of the image
 
 	   *starsize*: float in kpc (default: None)
 		 If not None, sets the maximum size of stars in the image
