@@ -1578,6 +1578,8 @@ def param2units(sim):
                 except:
                     pass
 
+    sim._override_units_system()
+
 
 @TipsySnap.decorator
 def settime(sim):

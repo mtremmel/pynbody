@@ -124,10 +124,12 @@ def sideon(h, vec_to_xform=calc_sideon_matrix, cen_size="1 kpc",
     tx = transformation.inverse_v_translate(tx, vcen)
 
     # Use gas from inner 10kpc to calculate angular momentum vector
-    if (len(h.gas[filt.Sphere(disk_size)]) > 100):
-        cen = h.gas[filt.Sphere(disk_size)]
-    else:
-        cen = h[filt.Sphere(disk_size)]
+    cen = h.gas[filt.Sphere(disk_size)]
+    if (len(cen) < 100):
+        if len(h.s[filt.Sphere(disk_size)])>len(cen):
+            cen = h.s[filt.Sphere(disk_size)]
+    if len(cen)==0:
+        cen = h.dm[filt.Sphere(disk_size)]
 
     logger.info("Calculating angular momentum vector...")
     trans = vec_to_xform(ang_mom_vec(cen))
