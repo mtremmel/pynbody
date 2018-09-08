@@ -82,7 +82,7 @@ def render(sim, filename=None,
 		   resolution=500,
 		   starsize=None,
 		   plot=True, axes=None, ret_im=False, clear=True,
-		   ret_range=False, with_dust=False, z_range=50.0, resolution=500):
+		   ret_range=False, with_dust=False, z_range=50.0):
 	'''
 	Make a 3-color image of stars.
 
