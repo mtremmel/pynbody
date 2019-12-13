@@ -141,7 +141,7 @@ def velocity_image(sim, width="10 kpc", vector_color='black', edgecolor='black',
         p.xlim(-width/2, width/2)
         p.ylim(-width/2, width/2)
 
-    return im, Q
+    return im, Q, X, Y, vx, vy
 
 
 def volume(sim, qty='rho', width=None, resolution=200,
