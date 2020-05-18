@@ -987,7 +987,7 @@ def _abundance_estimator(metal):
     return Y_H, Y_He
 
 
-@TipsySnap.derived_quantity
+@SimSnap.derived_quantity
 def HII(sim):
     """Number of HII ions per proton mass"""
     Y_H, Y_He = _abundance_estimator(sim["metals"])
@@ -997,26 +997,26 @@ def HII(sim):
         return Y_H - sim["HI"]
 
 
-@TipsySnap.derived_quantity
+@SimSnap.derived_quantity
 def HeIII(sim):
     """Number of HeIII ions per proton mass"""
     Y_H, Y_He = _abundance_estimator(sim["metals"])
     return Y_He - sim["HeII"] - sim["HeI"]
 
 
-@TipsySnap.derived_quantity
+@SimSnap.derived_quantity
 def ne(sim):
     """Number of electrons per proton mass"""
     return sim["HII"] + sim["HeII"] + 2 * sim["HeIII"]
 
 
-@TipsySnap.derived_quantity
+@SimSnap.derived_quantity
 def hetot(self):
     """Helium mass fraction including correction based on metallicity"""
     return 0.236 + (2.1 * self['metals'])
 
 
-@TipsySnap.derived_quantity
+@SimSnap.derived_quantity
 def hydrogen(self):
     """Hydrogen mass fraction including correction based on metallicity"""
     return 1.0 - self['metals'] - self['hetot']
