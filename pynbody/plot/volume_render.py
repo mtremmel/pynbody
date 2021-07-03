@@ -11,7 +11,7 @@ class RenderVolume(object):
 		self.resolution = resolution
 		self.width = width
 
-	def gas_density(self, vmin=None, vmax=None, dynamic_range=4, log=True, color=None, colortable=None, create_figure=True):
+	def density(self, family=None, vmin=None, vmax=None, dynamic_range=4, log=True, color=None, colortable=None, create_figure=True):
 		import mayavi
 		from mayavi import mlab
 		from tvtk.util.ctf import PiecewiseFunction, ColorTransferFunction
@@ -20,7 +20,15 @@ class RenderVolume(object):
 		if create_figure:
 			fig = mlab.figure(size=(500, 500), bgcolor=(0, 0, 0))
 
-		grid_data = sph.to_3d_grid(self.sim, qty='rho', nx=self.resolution,
+		ss = self.sim
+		if family == 'gas':
+			ss = self.sim.g
+		if family == 'dm':
+			ss = self.sim.dm
+		if family == 'star':
+			ss = self.sim.s
+
+		grid_data = sph.to_3d_grid(ss, qty='rho', nx=self.resolution,
 		                           x2=None if self.width is None else self.width / 2)
 
 		if log:
@@ -29,6 +37,15 @@ class RenderVolume(object):
 				vmin = grid_data.max() - dynamic_range
 			if vmax is None:
 				vmax = grid_data.max()
+
+		else:
+			if vmin is None:
+				vmin = np.min(grid_data)
+			if vmax is None:
+				vmax = np.max(grid_data)
+
+		grid_data[grid_data < vmin] = vmin
+		grid_data[grid_data > vmax] = vmax
 
 		otf = PiecewiseFunction()
 		otf.add_point(vmin, 0.0)
@@ -59,6 +76,11 @@ class RenderVolume(object):
 
 		return V
 
+	def gas_density(self,**kwargs):
+		return self.density(family='gas', **kwargs)
 
+	def dm_density(self,**kwargs):
+		return self.density(family='dm', **kwargs)
 
-
+	def star_density(self, **kwargs):
+		return self.density(family='star', **kwargs)
