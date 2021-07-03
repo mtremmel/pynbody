@@ -117,7 +117,7 @@ class RenderVolume(object):
 		if log is True:
 			grid_data = np.log10(grid_data)
 			vmax = np.log10(vmax)
-			vmin = np.log10(np.max(vmin,0.0001))
+			vmin = np.log10(np.max((vmin,0.0001)))
 
 		grid_data[(grid_data>vmax)] = vmax
 		grid_data[(grid_data<vmin)] = vmin
