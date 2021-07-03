@@ -14,6 +14,8 @@ class RenderVolume(object):
 	def _create_colormap(self, colortable, vmin, vmax):
 		from tvtk.util.ctf import ColorTransferFunction
 
+		ctf = ColorTransferFunction()
+
 		vbins = np.arange(vmin, vmax, (vmax - vmin) / len(colortable))
 		for i in range(len(colortable)):
 			ctf.add_rgb_point(vbins[i], colortable[i][0] / 256., colortable[i][1] / 256., colortable[i][2] / 256.)
