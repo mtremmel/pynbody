@@ -11,7 +11,7 @@ class RenderVolume(object):
 		self.resolution = resolution
 		self.width = width
 
-	def gas_density(self, vmin=None, vmax=None, dyn_range=4, log=True, color=None, colortable=None, create_figure=True):
+	def gas_density(self, vmin=None, vmax=None, dynamic_range=4, log=True, color=None, colortable=None, create_figure=True):
 		import mayavi
 		from mayavi import mlab
 		from tvtk.util.ctf import PiecewiseFunction, ColorTransferFunction
