@@ -71,7 +71,7 @@ class RenderVolume(object):
 
 		if color is None:
 			if colortable is None: #default colormap is cubehelix
-				colortable = palettable.cubehelix.cubehelix1_16.colors
+				colortable = np.array(palettable.cubehelix.cubehelix1_16.colors)
 			ctf = self._create_colormap(colortable,vmin,vmax)
 			V._volume_property.set_color(ctf)
 			V._ctf = ctf
@@ -133,7 +133,7 @@ class RenderVolume(object):
 
 		if color is None:
 			if colortable is None: #default colormap is BlueOrange10
-				colortable = palettable.lightbartlein.diverging.BlueOrange10_10.colors
+				colortable = np.array(palettable.lightbartlein.diverging.BlueOrange10_10.colors)
 			ctf = self._create_colormap(colortable,vmin,vmax)
 			V._volume_property.set_color(ctf)
 			V._ctf = ctf
