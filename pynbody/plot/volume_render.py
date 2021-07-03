@@ -120,7 +120,7 @@ class RenderVolume(object):
 			vmin = np.log10(np.max(vmin,0.0001))
 
 		grid_data[(grid_data>vmax)] = vmax
-		grid_data[(grid_data<vmin)] = vmax #make all the really small ages
+		grid_data[(grid_data<vmin)] = vmin
 
 		otf = PiecewiseFunction()
 		otf.add_point(vmax, 0.0)
