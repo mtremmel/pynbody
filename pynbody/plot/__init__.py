@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from . import generic, stars, gas, profile, metals, util, volume
+from . import generic, stars, gas, profile, metals, util, volume_render
 import imp
 
 imp.reload(profile)
@@ -9,7 +9,7 @@ imp.reload(stars)
 imp.reload(gas)
 imp.reload(metals)
 imp.reload(util)
-imp.reload(volume)
+imp.reload(volume_render)
 
 from .profile import rotation_curve, fourier_profile, density_profile
 from .generic import hist2d, gauss_kde, fourier_map, qprof
