@@ -108,7 +108,8 @@ class RenderVolume(object):
 
 		if vmin is None:
 			vmin=0
-		vmax = self.sim.properties['time']
+		if vmax is None:
+			vmax = self.sim.properties['time']
 
 		if log is True:
 			grid_data = np.log10(grid_data)
