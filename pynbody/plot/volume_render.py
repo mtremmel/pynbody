@@ -3,6 +3,7 @@ import matplotlib
 import numpy as np
 from .. import sph, config
 from .. import units as _units
+from .. import filt
 
 class RenderVolume(object):
 	def __init__(self, sim, resolution=500, width=None):
@@ -102,7 +103,7 @@ class RenderVolume(object):
 		if create_figure:
 			fig = mlab.figure(size=(500, 500), bgcolor=(0, 0, 0))
 
-		grid_data = sph.to_3d_grid(self.sim.s, qty='tform', nx=self.resolution, snap_slice=pynbody.filt.HighPass('tform',0),
+		grid_data = sph.to_3d_grid(self.sim.s, qty='tform', nx=self.resolution, snap_slice=filt.HighPass('tform',0),
 		                           x2=None if self.width is None else self.width / 2)
 
 		grid_data = self.sim.properties['time'].in_units('Gyr') - grid_data.in_units('Gyr')
