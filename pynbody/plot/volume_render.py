@@ -123,8 +123,8 @@ class RenderVolume(object):
 		grid_data[(grid_data<vmin)] = vmin
 
 		otf = PiecewiseFunction()
-		otf.add_point(vmax, 0.0)
 		otf.add_point(vmin, 1.0)
+		otf.add_point(vmax, 0.0)
 
 		sf = mayavi.tools.pipeline.scalar_field(grid_data)
 		V = mlab.pipeline.volume(sf, color=color, vmin=vmin, vmax=vmax)
