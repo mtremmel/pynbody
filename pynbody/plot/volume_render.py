@@ -111,7 +111,7 @@ class RenderVolume(object):
 
 		data_name = 'star_tform'
 
-		if create_figure:b
+		if create_figure:
 			fig = mlab.figure(size=(500, 500), bgcolor=(0, 0, 0))
 
 		if data_name in self._loaded_data.keys():
