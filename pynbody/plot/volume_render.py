@@ -101,7 +101,7 @@ class RenderVolume(object):
 	def star_density(self, **kwargs):
 		return self.density(family='star', **kwargs)
 
-	def star_tform(self,min_age=None, max_age=None, log=False, maxstarsize=0.5,
+	def star_tform(self,min_age=None, max_age=None, log=False, starsize=0.5,
 	            color=None, colortable=None, create_figure=True, age_bins=None):
 
 		import mayavi
