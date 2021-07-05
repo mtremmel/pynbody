@@ -117,7 +117,7 @@ class RenderVolume(object):
 
 		if starsize is not None:
 			smf = filt.HighPass('smooth', str(starsize) + ' kpc')
-			sim.s[smf]['smooth'] = array.SimArray(starsize, 'kpc', sim=self.sim)
+			self.sim.s[smf]['smooth'] = array.SimArray(starsize, 'kpc', sim=self.sim)
 
 		if data_name in self._loaded_data.keys():
 			print("using previously calculated data grid")
