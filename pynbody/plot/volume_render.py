@@ -101,7 +101,7 @@ class RenderVolume(object):
 	def star_density(self, **kwargs):
 		return self.density(family='star', **kwargs)
 
-	def star_tform(self,min_age=None, max_age=None, log=True,
+	def star_tform(self,min_age=None, max_age=None, log=False,
 	            color=None, colortable=None, create_figure=True, age_bins=None):
 
 		import mayavi
@@ -111,7 +111,7 @@ class RenderVolume(object):
 
 		data_name = 'star_tform'
 
-		if create_figure:
+		if create_figure:b
 			fig = mlab.figure(size=(500, 500), bgcolor=(0, 0, 0))
 
 		if data_name in self._loaded_data.keys():
@@ -163,6 +163,7 @@ class RenderVolume(object):
 			else:
 				age_bins = np.array(age_bins) #make sure age_bins is an array
 			vbins = sim_time - age_bins
+			vbins = vbins[::-1]
 			if log is True:
 				vbins = np.log10(vbins)
 			ctf = self._create_colormap(colortable,vbins)
