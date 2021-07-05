@@ -153,7 +153,7 @@ class RenderVolume(object):
 
 		otf = PiecewiseFunction()
 		otf.add_point(vmin, 0.0)
-		otf.add_point(vmax, 1.0)
+		otf.add_point(10.0, 1.0)
 
 		sf = mayavi.tools.pipeline.scalar_field(grid_data)
 		V = mlab.pipeline.volume(sf, color=color, vmin=vmin, vmax=vmax)
@@ -164,7 +164,7 @@ class RenderVolume(object):
 			if colortable is None: #default colormap is BlueOrange10
 				colortable = np.array(palettable.lightbartlein.diverging.BlueOrange10_6.colors)[::-1]
 			if age_bins is None:
-				age_bins = np.array([0.01, 0.1, 1.0, 2.0, 4.0, 10.0])
+				age_bins = np.array([1.0, 3.0, 4.0, 0.6,10.0,14.0])
 			else:
 				age_bins = np.array(age_bins) #make sure age_bins is an array
 			vbins = sim_time - age_bins
