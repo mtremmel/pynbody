@@ -3,7 +3,7 @@ import matplotlib
 import numpy as np
 from .. import sph, config
 from .. import units as _units
-from .. import filt
+from .. import filt, array
 
 class RenderVolume(object):
 	def __init__(self, sim, resolution=500, width=None):
