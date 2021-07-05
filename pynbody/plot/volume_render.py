@@ -11,6 +11,7 @@ class RenderVolume(object):
 		self.sim = sim
 		self.resolution = resolution
 		self.width = width
+		self._loaded_data = {} #store calculated grids for faster plotting
 
 	def _create_colormap(self, colortable, vbins):
 		from tvtk.util.ctf import ColorTransferFunction
@@ -32,16 +33,25 @@ class RenderVolume(object):
 		if create_figure:
 			fig = mlab.figure(size=(500, 500), bgcolor=(0, 0, 0))
 
+		data_name = 'all_den'
 		ss = self.sim
 		if family == 'gas':
+			data_name = 'gas_den'
 			ss = self.sim.g
 		if family == 'dm':
+			data_name = 'dm_den'
 			ss = self.sim.dm
 		if family == 'star':
+			data_name = 'star_den'
 			ss = self.sim.s
 
-		grid_data = sph.to_3d_grid(ss, qty='rho', nx=self.resolution,
+		if data_name in self._loaded_data.keys():
+			print("using previously calculated data grid")
+			grid_data = self._loaded_data[data_name]
+		else:
+			grid_data = sph.to_3d_grid(ss, qty='rho', nx=self.resolution,
 		                           x2=None if self.width is None else self.width / 2)
+			self._loaded_data[data_name] = grid_data
 
 		if log:
 			grid_data = np.log10(grid_data)
@@ -99,11 +109,18 @@ class RenderVolume(object):
 		from tvtk.util.ctf import PiecewiseFunction, ColorTransferFunction
 		import palettable
 
+		data_name = 'star_tform'
+
 		if create_figure:
 			fig = mlab.figure(size=(500, 500), bgcolor=(0, 0, 0))
 
-		grid_data = sph.to_3d_grid(self.sim.s, qty='tform', nx=self.resolution, snap_slice=filt.HighPass('tform',0),
+		if data_name in self._loaded_data.keys():
+			print("using previously calculated data grid")
+			grid_data = self._loaded_data[data_name]
+		else:
+			grid_data = sph.to_3d_grid(self.sim.s, qty='tform', nx=self.resolution, snap_slice=filt.HighPass('tform',0),
 		                           x2=None if self.width is None else self.width / 2)
+			self._loaded_data[data_name] = grid_data
 
 		grid_data = grid_data.in_units('Gyr')
 
@@ -143,6 +160,8 @@ class RenderVolume(object):
 				colortable = np.array(palettable.lightbartlein.diverging.BlueOrange10_6.colors)[::-1]
 			if age_bins is None:
 				age_bins = np.array([0.01, 0.1, 1.0, 2.0, 4.0, 10.0])
+			else:
+				age_bins = np.array(age_bins) #make sure age_bins is an array
 			vbins = sim_time - age_bins
 			if log is True:
 				vbins = np.log10(vbins)
