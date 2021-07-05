@@ -101,7 +101,7 @@ class RenderVolume(object):
 	def star_density(self, **kwargs):
 		return self.density(family='star', **kwargs)
 
-	def star_tform(self,min_age=None, max_age=None, log=False,
+	def star_tform(self,min_age=None, max_age=None, log=False, maxstarsize=0.5,
 	            color=None, colortable=None, create_figure=True, age_bins=None):
 
 		import mayavi
@@ -113,6 +113,11 @@ class RenderVolume(object):
 
 		if create_figure:
 			fig = mlab.figure(size=(500, 500), bgcolor=(0, 0, 0))
+
+
+		if starsize is not None:
+			smf = filt.HighPass('smooth', str(starsize) + ' kpc')
+			sim.s[smf]['smooth'] = array.SimArray(starsize, 'kpc', sim=self.sim)
 
 		if data_name in self._loaded_data.keys():
 			print("using previously calculated data grid")
