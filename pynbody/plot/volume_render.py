@@ -26,13 +26,13 @@ class RenderVolume(object):
 	def _create_grid_data(self, qty, family=None, width=None, snap_slice=None, recalc=False):
 		ss = self.sim
 		data_name = 'all_'+qty
-		if family=='star':
+		if family in ['star','stars']:
 			data_name = 'star_'+qty
 			ss = self.sim.s
 		if family=='gas':
 			data_name = 'gas_' + qty
 			ss = self.sim.g
-		if family=='dm':
+		if family in ['dm','dark']:
 			data_name = 'dm_' + qty
 			ss = self.sim.dm
 
@@ -54,7 +54,7 @@ class RenderVolume(object):
 
 	def render(self, qty, family=None, width=None, vmin=None, vmax=None, dynamic_range=4,
 	           log=True, color=None, colortable=None, create_figure=True, snap_slice=None,
-	           recalc=False, bins=None):
+	           recalc=False, bins=None, clear=True):
 
 		import mayavi
 		from mayavi import mlab
@@ -65,10 +65,10 @@ class RenderVolume(object):
 			raise ValueError("qty must be a strong, e.g. 'rho', 'temp'")
 
 		if family is not None:
-			if family not in ['gas','star','dm']:
+			if family not in ['gas','star','stars','dm', 'dark']:
 				raise ValueError("family must be one of these strings: 'gas','star','dm'")
 
-		if family == 'star':
+		if family in ['star','stars']:
 			if self._starsize:
 				smf = filt.HighPass('smooth', str(self._starsize) + ' kpc')
 				self.sim.s[smf]['smooth'] = array.SimArray(self._starsize, 'kpc', sim=self.sim)
@@ -80,6 +80,8 @@ class RenderVolume(object):
 
 		if create_figure:
 			fig = mlab.figure(size=(500, 500), bgcolor=(0, 0, 0))
+		if clear:
+			mlab.clf()
 
 		if family=='star' and (qty=='tform' or qty=='age'):
 			sim_time = self.sim.properties['time'].in_units('Gyr')
@@ -90,7 +92,7 @@ class RenderVolume(object):
 					bins = bins[::-1]
 				if qty == 'age':
 					bins = np.array([1.0, 3.0, 4.0, 6.0, 10.0, 14.0])
-		if bins:
+		if bins is not None:
 			vmin = bins.min()
 			vmax = bins.max()
 
