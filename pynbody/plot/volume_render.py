@@ -145,11 +145,8 @@ class RenderVolume(object):
 			V._ctf = ctf
 			V.update_ctf = True
 
-		if otf is not None:
-			V._otf = otf
-			V._volume_property.set_scalar_opacity(otf)
-		else:
-			V._volume_property.set_scalar_opacity(opacity)
+		V._otf = otf
+		V._volume_property.set_scalar_opacity(otf)
 
 		return V
 
