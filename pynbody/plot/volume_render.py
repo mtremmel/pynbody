@@ -5,9 +5,6 @@ from .. import sph, config
 from .. import units as _units
 from .. import filt, array
 
-class VolumeGridData(object):
-	def __init__(self, sim, slice):
-
 class RenderVolume(object):
 	def __init__(self, sim, resolution=500):
 		sim.physical_units() # make sure things are in physical units!
