@@ -88,32 +88,35 @@ class RenderVolume(object):
 			if bins is None and vmin is None and vmax is None:
 				print("using default bins for ", qty)
 				if qty=='tform':
-					bins = sim_time - np.array([1.0, 3.0, 4.0, 6.0, 10.0, 14.0])
+					bins = sim_time - np.array([0.0, 1.0, 3.0, 4.0, 6.0, 10.0, 14.0])
 					bins = bins[::-1]
 				if qty == 'age':
-					bins = np.array([1.0, 3.0, 4.0, 6.0, 10.0, 14.0])
+					bins = np.array([0.0, 1.0, 3.0, 4.0, 6.0, 10.0, 14.0])
+				if log:
+					bins = np.log10(bins)
 		if bins is not None:
 			vmin = bins.min()
 			vmax = bins.max()
 
 		if log:
 			grid_data = np.log10(grid_data)
-			if vmin is None:
-				vmin = grid_data.max() - dynamic_range
 			if vmax is None:
 				vmax = grid_data.max()
+			if vmin is None:
+				vmin = grid_data.max() - dynamic_range
 		else:
 			if vmin is None:
 				vmin = np.min(grid_data)
 			if vmax is None:
 				vmax = np.max(grid_data)
 
-		grid_data[grid_data < vmin] = vmin
-		grid_data[grid_data > vmax] = vmax
+		grid_data[grid_data < vmin] = vmin/10
+		grid_data[grid_data > vmax] = vmax*10
 
 		otf = PiecewiseFunction()
 		otf.add_point(vmin, 0.0)
 		otf.add_point(vmax, 1.0)
+		otf.add_point(1.1*vmax,0.0)
 
 		sf = mayavi.tools.pipeline.scalar_field(grid_data)
 		V = mlab.pipeline.volume(sf, color=color, vmin=vmin, vmax=vmax)
