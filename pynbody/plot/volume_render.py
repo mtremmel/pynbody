@@ -110,8 +110,9 @@ class RenderVolume(object):
 			if vmax is None:
 				vmax = np.max(grid_data)
 
-		#grid_data[grid_data < vmin] = vmin
-		#grid_data[grid_data > vmax] = vmax
+		grid_data[grid_data < vmin] = vmin
+		grid_data[grid_data > vmax] = vmax
+
 		otf = PiecewiseFunction()
 		if not max_opacity:
 			max_opacity = 1
