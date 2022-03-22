@@ -112,20 +112,15 @@ class RenderVolume(object):
 
 		#grid_data[grid_data < vmin] = vmin
 		#grid_data[grid_data > vmax] = vmax
-		otf = PiecewiseFunction()
-		if opacity is None:
-			if cutlow:
-				otf.add_point(vmin,0.0)
-				otf.add_point(vmax,1.0)
+		otf = None
+		if not opacity:
+			otf = PiecewiseFunction()
 			if cuthigh:
-				otf.add_point(vmin,1.0)
 				otf.add_point(vmax,0.0)
-			if not cutlow and not cuthigh:
-				otf.add_point(vmin,0.25)
-				otf.add_point(vmax,0.25)
-		else:
-			otf.add_point(vmin,opacity)
-			otf.add_point(vmax,opacity)
+				otf.add_point(vmin,0.8)
+			else:
+				otf.add_point(vmin,0.0)
+				otf.add_point(vmax,0.8)
 
 		sf = mayavi.tools.pipeline.scalar_field(grid_data)
 		V = mlab.pipeline.volume(sf, color=color, vmin=vmin, vmax=vmax)
@@ -145,8 +140,11 @@ class RenderVolume(object):
 			V._ctf = ctf
 			V.update_ctf = True
 
-		V._otf = otf
-		V._volume_property.set_scalar_opacity(otf)
+		if otf is not None:
+			V._otf = otf
+			V._volume_property.set_scalar_opacity(otf)
+		else:
+			V._volume_property.set_scalar_opacity(opacity)
 
 		return V
 
