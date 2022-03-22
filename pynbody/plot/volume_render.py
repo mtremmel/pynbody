@@ -70,8 +70,8 @@ class RenderVolume(object):
 
 		if family == 'star':
 			if self._starsize:
-				smf = filt.HighPass('smooth', str(self.starsize) + ' kpc')
-				self.sim.s[smf]['smooth'] = array.SimArray(self.starsize, 'kpc', sim=self.sim)
+				smf = filt.HighPass('smooth', str(self._starsize) + ' kpc')
+				self.sim.s[smf]['smooth'] = array.SimArray(self._starsize, 'kpc', sim=self.sim)
 			if snap_slice is None:
 				#default stars to not include BHs
 				snap_slice = filt.HighPass('tform',0)
