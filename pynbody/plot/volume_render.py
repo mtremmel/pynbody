@@ -54,7 +54,7 @@ class RenderVolume(object):
 
 	def render(self, qty, family=None, width=None, vmin=None, vmax=None, dynamic_range=4,
 	           log=True, color=None, colortable=None, create_figure=True, snap_slice=None,
-	           recalc=False, bins=None, clear=True, cutlow=True, cuthigh=False, opacity=None):
+	           recalc=False, bins=None, clear=True, cut='low', max_opacity=None):
 
 		import mayavi
 		from mayavi import mlab
@@ -112,15 +112,20 @@ class RenderVolume(object):
 
 		#grid_data[grid_data < vmin] = vmin
 		#grid_data[grid_data > vmax] = vmax
-		otf = None
-		if not opacity:
-			otf = PiecewiseFunction()
-			if cuthigh:
-				otf.add_point(vmax,0.0)
-				otf.add_point(vmin,0.8)
-			else:
-				otf.add_point(vmin,0.0)
-				otf.add_point(vmax,0.8)
+		otf = PiecewiseFunction()
+		if not max_opacity:
+			max_opacity = 1
+		if cut=='high':
+			otf.add_point(vmax,0.0)
+			otf.add_point(vmin,max_opacity)
+		if cut=='low':
+			otf.add_point(vmin,0)
+			otf.add_point(vmax,max_opacity)
+		if cut=='none':
+			otf.add_point((vmax-vmin)/2.,max_opacity)
+			otf.add_point(vmin,max_opacity*0.5)
+			otf.add_point(vmax,max_opacity*0.5)
+
 
 		sf = mayavi.tools.pipeline.scalar_field(grid_data)
 		V = mlab.pipeline.volume(sf, color=color, vmin=vmin, vmax=vmax)
