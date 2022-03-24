@@ -138,8 +138,10 @@ class RenderVolume(object):
 				if family=='star' and qty in ['tform','age']:
 					colortable = np.array(palettable.lightbartlein.diverging.BlueOrange10_6.colors)
 					if qty == 'tform': colortable = colortable[::-1] #reverse blue/orange for tform values
-				else:
+				if qty=='rho':
 					colortable = np.array(palettable.cubehelix.cubehelix1_16.colors)
+				if qty=='temp':
+					colortable = np.array(palettable.lightbartlein.diverging.BlueDarkRed12_12.colors)
 			vbins = np.arange(vmin, vmax, (vmax - vmin) / len(colortable))
 			ctf = self._create_colormap(colortable,vbins)
 			V._volume_property.set_color(ctf)
