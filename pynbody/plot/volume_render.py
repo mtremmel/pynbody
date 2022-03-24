@@ -44,7 +44,8 @@ class RenderVolume(object):
 			grid_data = self._loaded_data[data_name]
 		else:
 			grid_data = sph.to_3d_grid(ss, qty=qty, nx=self.resolution,snap_slice=snap_slice,
-		                           x2=None if width is None else width / 2)
+		                           x2=None if width is None else width / 2, denoise=True,
+		                               approximate_fast=False)
 			self._loaded_data[data_name] = grid_data
 		return grid_data
 
