@@ -6,12 +6,34 @@ from .. import units as _units
 from .. import filt, array
 
 class RenderVolume(object):
-	def __init__(self, sim, resolution=500):
-		sim.physical_units() # make sure things are in physical units!
+	def __init__(self, sim, resolution=500, load_file=None):
+		if sim is None and load_file is None:
+			raise RuntimeError("Cannot create a volume render with neither a simulation nor previously saved grids!")
+		if sim:
+			sim.physical_units() # make sure things are in physical units!
 		self.sim = sim
 		self.resolution = resolution
 		self._loaded_data = {} #store calculated grids for faster plotting
 		self._starsize=0.25 #default starsize
+		self._load_file = load_file
+		if load_file:
+			self.load(load_file)
+
+	def load(self, filename):
+		import pickle
+		f = open(filename,'rb')
+		saved_data = pickle.load(f)
+		if type(saved_data)!=dict:
+			raise ValueError("Error Loading datafile "+filename+" Expecting a pickle file with a dictionary of 3d grids!")
+		self._loaded_data = saved_data
+
+	def save(self, filename):
+		import pickle
+		if len(self._loaded_data.keys())==0:
+			raise RuntimeError("no data currently loaded!")
+		f = open(filename,'wb')
+		pickle.dump(self._loaded_data,f)
+		f.close()
 
 	def _create_colormap(self, colortable, vbins):
 		from tvtk.util.ctf import ColorTransferFunction
@@ -88,10 +110,10 @@ class RenderVolume(object):
 			if bins is None and vmin is None and vmax is None:
 				print("using default bins for ", qty)
 				if qty=='tform':
-					bins = sim_time - np.array([0.0, 1.0, 3.0, 4.0, 6.0, 10.0, 14.0])
+					bins = sim_time - np.array([1.0, 3.0, 4.0, 6.0, 10.0, 14.0])
 					bins = bins[::-1]
 				if qty == 'age':
-					bins = np.array([0.0, 1.0, 3.0, 4.0, 6.0, 10.0, 14.0])
+					bins = np.array([1.0, 3.0, 4.0, 6.0, 10.0, 14.0])
 				if log:
 					bins = np.log10(bins)
 		if bins is not None:
@@ -135,7 +157,7 @@ class RenderVolume(object):
 
 		if color is None:
 			if colortable is None: #default colormap is cubehelix unless looking at stellar age
-				if family=='star' and qty in ['tform','age']:
+				if family in ['star','stars'] and qty in ['tform','age']:
 					colortable = np.array(palettable.lightbartlein.diverging.BlueOrange10_6.colors)
 					if qty == 'tform': colortable = colortable[::-1] #reverse blue/orange for tform values
 				if qty=='rho':
