@@ -126,16 +126,24 @@ class RenderVolume(object):
 				vmax = grid_data.max()
 			if vmin is None:
 				vmin = grid_data.max() - dynamic_range
+			vmin_cut = vmin - 1000
+			vmax_cut = vmax + 1000
+
 		else:
 			if vmin is None:
 				vmin = np.min(grid_data)
 			if vmax is None:
 				vmax = np.max(grid_data)
+			vmin_cut = vmin/10
+			vmax_cut = vmax*10
 
-		grid_data[grid_data < vmin] = vmin
-		grid_data[grid_data > vmax] = vmax
+		grid_data[grid_data < vmin] = vmin_cut
+		grid_data[grid_data > vmax] = vmax_cut
 
 		otf = PiecewiseFunction()
+		otf.add_point(vmax_cut,0)
+		otf.add_point(vmin_cut,0)
+
 		if not max_opacity:
 			max_opacity = 1
 		if cut=='high':
@@ -148,6 +156,10 @@ class RenderVolume(object):
 			otf.add_point((vmax-vmin)/2.,max_opacity)
 			otf.add_point(vmin,max_opacity*0.5)
 			otf.add_point(vmax,max_opacity*0.5)
+		if cut=='middle':
+			otf.add_point((vmax - vmin) / 2., 0)
+			otf.add_point(vmin, max_opacity)
+			otf.add_point(vmax, max_opacity)
 
 
 		sf = mayavi.tools.pipeline.scalar_field(grid_data)
