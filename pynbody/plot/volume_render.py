@@ -45,7 +45,7 @@ class RenderVolume(object):
 
 		return ctf
 
-	def _create_grid_data(self, qty, family=None, width=None, snap_slice=None, recalc=False):
+	def _create_grid_data(self, qty, family=None, width=None, snap_slice=None, recalc=False, weight=None):
 		ss = self.sim
 		data_name = 'all_'+qty
 		if family in ['star','stars']:
@@ -58,6 +58,12 @@ class RenderVolume(object):
 			data_name = 'dm_' + qty
 			ss = self.sim.dm
 
+		if weight not None:
+			data_name = data_name+"_"+weight
+			qty_orig_string = qty
+			qty = qty+'_'+weight
+			ss[qty] = ss[qty_orig_string]*ss[weight]
+
 		if width:
 			data_name = data_name+'_'+str(width)
 
@@ -67,6 +73,10 @@ class RenderVolume(object):
 		else:
 			grid_data = sph.to_3d_grid(ss, qty=qty, nx=self.resolution,snap_slice=snap_slice,
 		                           x2=None if width is None else width / 2)
+			if weight not None:
+				grid_data_weight = sph.to_3d_grid(ss, qty=weight, nx=self.resolution,snap_slice=snap_slice,
+		                           x2=None if width is None else width / 2)
+				grid_data /= grid_data_weight
 			self._loaded_data[data_name] = grid_data
 		return grid_data
 
@@ -76,7 +86,7 @@ class RenderVolume(object):
 
 	def render(self, qty, family=None, width=None, vmin=None, vmax=None, dynamic_range=4,
 	           log=True, color=None, colortable=None, create_figure=True, snap_slice=None,
-	           recalc=False, bins=None, clear=True, cut='low', max_opacity=None):
+	           recalc=False, bins=None, clear=True, cut='low', max_opacity=None, weight=None):
 
 		import mayavi
 		from mayavi import mlab
@@ -84,7 +94,7 @@ class RenderVolume(object):
 		import palettable
 
 		if type(qty) != str:
-			raise ValueError("qty must be a strong, e.g. 'rho', 'temp'")
+			raise ValueError("qty must be a string, e.g. 'rho', 'temp'")
 
 		if family is not None:
 			if family not in ['gas','star','stars','dm', 'dark']:
@@ -98,7 +108,7 @@ class RenderVolume(object):
 				#default stars to not include BHs
 				snap_slice = filt.HighPass('tform',0)
 
-		grid_data = self._create_grid_data(qty, family=family, width=width, snap_slice=snap_slice, recalc=recalc)
+		grid_data = self._create_grid_data(qty, family=family, width=width, snap_slice=snap_slice, recalc=recalc, weight=weight)
 
 		if create_figure:
 			fig = mlab.figure(size=(500, 500), bgcolor=(0, 0, 0))
@@ -126,22 +136,20 @@ class RenderVolume(object):
 				vmax = grid_data.max()
 			if vmin is None:
 				vmin = grid_data.max() - dynamic_range
-			vmin_cut = vmin - 1000
-			vmax_cut = vmax + 1000
+			vmin_cut = vmin - 10
+			vmax_cut = vmax + 10
 
 		else:
 			if vmin is None:
 				vmin = np.min(grid_data)
 			if vmax is None:
 				vmax = np.max(grid_data)
-			vmin_cut = vmin/10
-			vmax_cut = vmax*10
+			vmin_cut = vmin/100
+			vmax_cut = vmax*100
 
-		grid_data[grid_data < vmin] = vmin_cut
-		grid_data[grid_data > vmax] = vmax_cut
+		grid_data[(grid_data is np.nan)|(np.abs(grid_data) ==np.inf)] = vmin_cut
 
 		otf = PiecewiseFunction()
-		otf.add_point(vmax_cut,0)
 		otf.add_point(vmin_cut,0)
 
 		if not max_opacity:
