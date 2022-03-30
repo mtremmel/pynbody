@@ -58,7 +58,7 @@ class RenderVolume(object):
 			data_name = 'dm_' + qty
 			ss = self.sim.dm
 
-		if weight not None:
+		if weight is not None:
 			data_name = data_name+"_"+weight
 			qty_orig_string = qty
 			qty = qty+'_'+weight
@@ -73,7 +73,7 @@ class RenderVolume(object):
 		else:
 			grid_data = sph.to_3d_grid(ss, qty=qty, nx=self.resolution,snap_slice=snap_slice,
 		                           x2=None if width is None else width / 2)
-			if weight not None:
+			if weight is not None:
 				grid_data_weight = sph.to_3d_grid(ss, qty=weight, nx=self.resolution,snap_slice=snap_slice,
 		                           x2=None if width is None else width / 2)
 				grid_data /= grid_data_weight
