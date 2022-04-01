@@ -226,7 +226,7 @@ class RenderVolume(object):
 			for i in range(len(grid_data)):
 				otf = self._get_opacities(grid_data[i].max()-dynamic_range, grid_data[i].max(), max_opacity, 'low')
 				sf = mayavi.tools.pipeline.scalar_field(grid_data[i])
-				V_part = mlab.pipeline.volume(sf, color=tuple(colortable[i]), vmin=grid_data[i].max()-dynamic_range, vmax=grid_data[i].max())
+				V_part = mlab.pipeline.volume(sf, color=tuple(colortable[i]/255), vmin=grid_data[i].max()-dynamic_range, vmax=grid_data[i].max())
 				V_part.trait_get('volume_mapper')['volume_mapper'].blend_mode = 'maximum_intensity'
 				V_part._otf = otf
 				V_part._volume_property.set_scalar_opacity(otf)
