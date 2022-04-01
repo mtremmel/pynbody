@@ -168,7 +168,7 @@ class RenderVolume(object):
 			if qty in ['tform', 'age']:
 				colortable = np.array(palettable.lightbartlein.diverging.BlueOrange10_6.colors)
 			if qty == 'temp':
-				colortable = np.array(palettable.lightbartlein.diverging.BlueDarkRed18_6.colors)
+				colortable = np.array(palettable.lightbartlein.diverging.BlueDarkRed18_4.colors)
 			if qty not in ['tform','age','temp']:
 				colortable = np.array(palettable.cubehelix.cubehelix1_16.colors)
 
