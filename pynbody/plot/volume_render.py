@@ -71,7 +71,7 @@ class RenderVolume(object):
 			if not log:
 				vmax = ss[qty].max()
 			else:
-				vmax = np.log10(ss[qty][filt.HighPass(qty,0)].max())
+				vmax = np.log10(ss[filt.HighPass(qty,0)][qty].max())
 		if vmin is None:
 			if not log or not dynamic_range:
 				vmin = ss[qty].min()
@@ -79,7 +79,7 @@ class RenderVolume(object):
 				if dynamic_range:
 					vmin = vmax - dynamic_range
 				else:
-					vmin = np.log10(ss[qty][filt.HighPass(qty, 0)].min())
+					vmin = np.log10(ss[filt.HighPass(qty, 0)][qty].min())
 		bins = np.arange(vmin, vmax, (vmax - vmin) / nbins)
 		return bins
 
