@@ -198,9 +198,8 @@ class RenderVolume(object):
 
 		if not weight:
 			if log:
-				grid_data[(grid_data==0)] = 10**(np.min(bins)-10)
 				grid_data = np.log10(grid_data)
-			grid_data[(grid_data<np.min(bins))] = np.min(bins)
+			grid_data[(grid_data < np.min(bins))] = np.min(bins)
 			grid_data[(grid_data > np.max(bins))] = np.max(bins)
 		else: #weighted data is always assumed to be log space
 			for i in range(len(grid_data)):
@@ -219,6 +218,8 @@ class RenderVolume(object):
 			V._ctf = ctf
 			V.update_ctf = True
 			V.trait_get('volume_mapper')['volume_mapper'].blend_mode = 'maximum_intensity'
+			V._otf = otf
+			V._volume_property.set_scalar_opacity(otf)
 
 		else:
 			V = []
@@ -230,6 +231,7 @@ class RenderVolume(object):
 				V_part._otf = otf
 				V_part._volume_property.set_scalar_opacity(otf)
 				V.append(V_part)
+
 
 		return V
 
