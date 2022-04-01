@@ -19,13 +19,22 @@ class RenderVolume(object):
 		if load_file:
 			self.load(load_file)
 
-	def load(self, filename):
+	def clear_cache(self):
+		import gc
+		del self._loaded_data
+		gc.collect()
+
+
+	def load(self, filename, overwrite=True):
 		import pickle
 		f = open(filename,'rb')
 		saved_data = pickle.load(f)
 		if type(saved_data)!=dict:
 			raise ValueError("Error Loading datafile "+filename+" Expecting a pickle file with a dictionary of 3d grids!")
-		self._loaded_data = saved_data
+		for key in saved_data.keys():
+			if key not in self._loaded_data.keys() or overwrite is False:
+				print("loading in ", key, " from ", filename)
+				self._loaded_data[key] = saved_data[key]
 
 	def save(self, filename):
 		import pickle
@@ -45,12 +54,42 @@ class RenderVolume(object):
 
 		return ctf
 
-	def _create_grid_data(self, qty, family=None, width=None, snap_slice=None, recalc=False, weight=None):
+	def _create_binned_grid_data(self, ss, qty, binned_qty, bins, width, log):
+		output = []
+		for i in range(len(bins)-1):
+			if log:
+				ss_part = ss[filt.BandPass(binned_qty, 10*bins[i], 10**bins[i+1])]
+			else:
+				ss_part = ss[filt.BandPass(binned_qty, bins[i], bins[i + 1])]
+			grid_part = sph.to_3d_grid(ss_part, qty=qty, nx=self.resolution,
+			                           x2=None if width is None else width / 2)
+			output.append(grid_part)
+		return output
+
+	def _set_bins(self, ss, qty, vmin, vmax, dynamic_range, log, nbins):
+		if vmax is None:
+			if not log:
+				vmax = ss[qty].max()
+			else:
+				vmax = np.log10(ss[qty].max())
+		if vmin is None:
+			if not log or not dynamic_range:
+				vmin = ss[qty].min()
+			if log:
+				if dynamic_range:
+					vmin = vmax - dynamic_range
+				else:
+					vmin = np.log10(ss[qty][filt.HighPass(qty, 0)].min())
+		bins = np.arange(vmin, vmax, (vmax - vmin) / nbins)
+		return bins
+
+	def _create_grid_data(self, qty, nbins, family=None, width=None, recalc=False, weight=None,
+	                      vmin=None, vmax=None, log=True, save=True, dynamic_range=4):
 		ss = self.sim
 		data_name = 'all_'+qty
 		if family in ['star','stars']:
 			data_name = 'star_'+qty
-			ss = self.sim.s
+			ss = self.sim.s[filt.HighPass('tform',0)] #remove black holes
 		if family=='gas':
 			data_name = 'gas_' + qty
 			ss = self.sim.g
@@ -58,43 +97,82 @@ class RenderVolume(object):
 			data_name = 'dm_' + qty
 			ss = self.sim.dm
 
-		if weight is not None:
-			data_name = data_name+"_"+weight
-			qty_orig_string = qty
-			qty = qty+'_'+weight
-			ss[qty] = ss[qty_orig_string]*ss[weight]
-
-		if snap_slice:
-			ss = ss[snap_slice]
-
 		if width:
 			data_name = data_name+'_'+str(width)
+
+		if weight is not None:
+			data_name = data_name+"_"+weight
+
+		bins = self._set_bins(ss, qty, vmin, vmax, dynamic_range, log, nbins)
+
+		if data_name in self._loaded_data.keys() and weight:
+			if nbins != len(self._loaded_data[data_name]):
+				if not recalc:
+					print("Warning! Provided colortable requires different binning... recalculating weighted 3d render")
+					recalc = True
 
 		if data_name in self._loaded_data.keys() and not recalc:
 			print("using previously calculated data grid")
 			grid_data = self._loaded_data[data_name]
+
 		else:
 			grid_data = sph.to_3d_grid(ss, qty=qty, nx=self.resolution,
 		                           x2=None if width is None else width / 2)
-			if weight is not None:
-				grid_data_weight = sph.to_3d_grid(ss, qty=weight, nx=self.resolution,
-		                           x2=None if width is None else width / 2)
-				grid_data /= grid_data_weight
-			self._loaded_data[data_name] = grid_data
-		return grid_data
+			if weight:
+				grid_data = self._create_binned_grid_data(ss, weight, qty, bins, width, log)
+			if save:
+				self._loaded_data[data_name] = grid_data
+		return grid_data, bins
+
+	def _get_opacities(self, vmin, vmax, max_opacity, cut):
+		from tvtk.util.ctf import PiecewiseFunction
+		otf = PiecewiseFunction()
+
+		if not max_opacity:
+			max_opacity = 1
+		if cut == 'high':
+			otf.add_point(vmax, 0.0)
+			otf.add_point(vmin, max_opacity)
+		if cut == 'low':
+			otf.add_point(vmin, 0)
+			otf.add_point(vmax, max_opacity)
+		if cut == 'none':
+			otf.add_point((vmax - vmin) / 2., max_opacity)
+			otf.add_point(vmin, max_opacity * 0.5)
+			otf.add_point(vmax, max_opacity * 0.5)
+		if cut == 'middle':
+			otf.add_point((vmax - vmin) / 2., 0)
+			otf.add_point(vmin, max_opacity)
+			otf.add_point(vmax, max_opacity)
+		if cut == 'both':
+			otf.add_point((vmax-vmin)/2.,max_opacity)
+			otf.add_point(vmin, 0)
+			otf.add_point(vmax, 0)
+
+		return otf
 
 	def set_starsize(self, size):
 		newsize = float(size) #make sure the input actually can be converted
 		self._starsize = newsize
 
 	def render(self, qty, family=None, width=None, vmin=None, vmax=None, dynamic_range=4,
-	           log=True, color=None, colortable=None, create_figure=True, snap_slice=None,
-	           recalc=False, bins=None, clear=True, cut='low', max_opacity=None, weight=None):
+	           log=True, color=None, colortable=None, create_figure=True,
+	           recalc=False, clear=True, cut='low', max_opacity=None, weight=None):
 
 		import mayavi
 		from mayavi import mlab
 		from tvtk.util.ctf import PiecewiseFunction, ColorTransferFunction
 		import palettable
+
+		if not colortable:
+			if qty in ['tform', 'age']:
+				colortable = np.array(palettable.lightbartlein.diverging.BlueOrange10_6.colors)
+			if qty == 'temp':
+				colortable = np.array(palettable.lightbartlein.diverging.BlueDarkRed18_6.colors)
+			if qty not in ['tform','age','temp']:
+				colortable = np.array(palettable.cubehelix.cubehelix1_16.colors)
+
+		nbins = len(colortable)
 
 		if type(qty) != str:
 			raise ValueError("qty must be a string, e.g. 'rho', 'temp'")
@@ -107,94 +185,44 @@ class RenderVolume(object):
 			if self._starsize:
 				smf = filt.HighPass('smooth', str(self._starsize) + ' kpc')
 				self.sim.s[smf]['smooth'] = array.SimArray(self._starsize, 'kpc', sim=self.sim)
-			if snap_slice is None:
-				#default stars to not include BHs
-				snap_slice = filt.HighPass('tform',0)
 
-		grid_data = self._create_grid_data(qty, family=family, width=width, snap_slice=snap_slice, recalc=recalc, weight=weight)
+		grid_data, bins = self._create_grid_data(qty, nbins, family=family, width=width, recalc=recalc, weight=weight,
+		                                   vmin=vmin, vmax=vmax, log=log)
 
 		if create_figure:
 			fig = mlab.figure(size=(500, 500), bgcolor=(0, 0, 0))
 		if clear:
 			mlab.clf()
 
-		if family=='star' and (qty=='tform' or qty=='age'):
-			sim_time = self.sim.properties['time'].in_units('Gyr')
-			if bins is None and vmin is None and vmax is None:
-				print("using default bins for ", qty)
-				if qty=='tform':
-					bins = sim_time - np.array([1.0, 3.0, 4.0, 6.0, 10.0, 14.0])
-					bins = bins[::-1]
-				if qty == 'age':
-					bins = np.array([1.0, 3.0, 4.0, 6.0, 10.0, 14.0])
-				if log:
-					bins = np.log10(bins)
-		if bins is not None:
-			vmin = bins.min()
-			vmax = bins.max()
+		if not weight:
+			if log:
+				grid_data[(grid_data==0)] = 10**(np.min(bins)-10)
+				grid_data = np.log10(grid_data)
+		else: #weighted data is always assumed to be log space
+			for i in range(len(grid_data)):
+				grid_data[i][(grid_data==0)] = np.min(grid_data[i][(grid_data>0)])/100
+				grid_data[i] = np.log10(grid_data[i])
 
-		if log:
-			grid_data = np.log10(grid_data)
-			if vmax is None:
-				vmax = grid_data.max()
-			if vmin is None:
-				vmin = grid_data.max() - dynamic_range
-			vmin_cut = vmin - 10
-			vmax_cut = vmax + 10
-
-		else:
-			if vmin is None:
-				vmin = np.min(grid_data)
-			if vmax is None:
-				vmax = np.max(grid_data)
-			vmin_cut = vmin/100
-			vmax_cut = vmax*100
-
-		grid_data[(grid_data is np.nan)|(np.abs(grid_data) ==np.inf)] = vmin_cut
-
-		otf = PiecewiseFunction()
-		otf.add_point(vmin_cut,0)
-
-		if not max_opacity:
-			max_opacity = 1
-		if cut=='high':
-			otf.add_point(vmax,0.0)
-			otf.add_point(vmin,max_opacity)
-		if cut=='low':
-			otf.add_point(vmin,0)
-			otf.add_point(vmax,max_opacity)
-		if cut=='none':
-			otf.add_point((vmax-vmin)/2.,max_opacity)
-			otf.add_point(vmin,max_opacity*0.5)
-			otf.add_point(vmax,max_opacity*0.5)
-		if cut=='middle':
-			otf.add_point((vmax - vmin) / 2., 0)
-			otf.add_point(vmin, max_opacity)
-			otf.add_point(vmax, max_opacity)
-
-
-		sf = mayavi.tools.pipeline.scalar_field(grid_data)
-		V = mlab.pipeline.volume(sf, color=color, vmin=vmin, vmax=vmax)
-
-		V.trait_get('volume_mapper')['volume_mapper'].blend_mode = 'maximum_intensity'
-
-		if color is None:
-			if colortable is None: #default colormap is cubehelix unless looking at stellar age
-				if family in ['star','stars'] and qty in ['tform','age']:
-					colortable = np.array(palettable.lightbartlein.diverging.BlueOrange10_6.colors)
-					if qty == 'tform': colortable = colortable[::-1] #reverse blue/orange for tform values
-				if qty=='rho':
-					colortable = np.array(palettable.cubehelix.cubehelix1_16.colors)
-				if qty=='temp':
-					colortable = np.array(palettable.lightbartlein.diverging.BlueDarkRed12_12.colors)
-			vbins = np.arange(vmin, vmax, (vmax - vmin) / len(colortable))
-			ctf = self._create_colormap(colortable,vbins)
+		if not weight:
+			otf = self._get_opacities(np.min(bins), np.max(bins), max_opacity, cut)
+			sf = mayavi.tools.pipeline.scalar_field(grid_data)
+			V = mlab.pipeline.volume(sf, color=color, vmin=vmin, vmax=vmax)
+			ctf = self._create_colormap(bins)
 			V._volume_property.set_color(ctf)
 			V._ctf = ctf
 			V.update_ctf = True
+			V.trait_get('volume_mapper')['volume_mapper'].blend_mode = 'maximum_intensity'
 
-		V._otf = otf
-		V._volume_property.set_scalar_opacity(otf)
+		else:
+			V = []
+			for i in range(len(grid_data)):
+				otf = self._get_opacities(grid_data[i].max()-dynamic_range, grid_data[i].max(), max_opacity, 'low')
+				sf = mayavi.tools.pipeline.scalar_field(grid_data[i])
+				V_part = mlab.pipeline.volume(sf, color=colortable[i], vmin=grid_data[i].max()-dynamic_range, vmax=grid_data[i].max())
+				V_part.trait_get('volume_mapper')['volume_mapper'].blend_mode = 'maximum_intensity'
+				V_part._otf = otf
+				V_part._volume_property.set_scalar_opacity(otf)
+				V.append(V_part)
 
 		return V
 
