@@ -71,7 +71,7 @@ class RenderVolume(object):
 			if not log:
 				vmax = ss[qty].max()
 			else:
-				vmax = np.log10(ss[qty].max())
+				vmax = np.log10(ss[qty][filt.HighPass(qty,0)].max())
 		if vmin is None:
 			if not log or not dynamic_range:
 				vmin = ss[qty].min()
