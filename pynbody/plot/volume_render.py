@@ -189,6 +189,8 @@ class RenderVolume(object):
 		grid_data, bins = self._create_grid_data(qty, nbins, family=family, width=width, recalc=recalc, weight=weight,
 		                                   vmin=vmin, vmax=vmax, log=log)
 
+		print("bins calculated: ", bins)
+
 		if create_figure:
 			fig = mlab.figure(size=(500, 500), bgcolor=(0, 0, 0))
 		if clear:
