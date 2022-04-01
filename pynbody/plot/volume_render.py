@@ -200,10 +200,15 @@ class RenderVolume(object):
 			if log:
 				grid_data[(grid_data==0)] = 10**(np.min(bins)-10)
 				grid_data = np.log10(grid_data)
+			grid_data[(grid_data<np.min(bins))] = np.min(bins)
+			grid_data[(grid_data > np.max(bins))] = np.max(bins)
 		else: #weighted data is always assumed to be log space
 			for i in range(len(grid_data)):
 				grid_data[i][(grid_data==0)] = np.min(grid_data[i][(grid_data>0)])/100
 				grid_data[i] = np.log10(grid_data[i])
+
+
+
 
 		if not weight:
 			otf = self._get_opacities(np.min(bins), np.max(bins), max_opacity, cut)
