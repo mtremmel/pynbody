@@ -208,7 +208,7 @@ class RenderVolume(object):
 		if not weight:
 			otf = self._get_opacities(np.min(bins), np.max(bins), max_opacity, cut)
 			sf = mayavi.tools.pipeline.scalar_field(grid_data)
-			V = mlab.pipeline.volume(sf, color=color, vmin=vmin, vmax=vmax)
+			V = mlab.pipeline.volume(sf, color=color, vmin=np.min(bins), vmax=np.max(bins))
 			ctf = self._create_colormap(colortable,bins)
 			V._volume_property.set_color(ctf)
 			V._ctf = ctf
