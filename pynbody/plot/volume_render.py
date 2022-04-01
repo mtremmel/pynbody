@@ -187,7 +187,7 @@ class RenderVolume(object):
 				self.sim.s[smf]['smooth'] = array.SimArray(self._starsize, 'kpc', sim=self.sim)
 
 		grid_data, bins = self._create_grid_data(qty, nbins, family=family, width=width, recalc=recalc, weight=weight,
-		                                   vmin=vmin, vmax=vmax, log=log)
+		                                   vmin=vmin, vmax=vmax, log=log, dynamic_range=dynamic_range)
 
 		print("bins calculated: ", bins)
 
