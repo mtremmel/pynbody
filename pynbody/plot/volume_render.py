@@ -208,15 +208,19 @@ class RenderVolume(object):
 		if clear:
 			mlab.clf()
 
+		global_max = None
 		if not weight:
 			if log:
 				grid_data = np.log10(grid_data)
 			grid_data[(grid_data < np.min(bins))] = np.min(bins)
 			grid_data[(grid_data > np.max(bins))] = np.max(bins)
 		else: #weighted data is always assumed to be log space
+			global_max = np.max(grid_data[i])
 			for i in range(len(grid_data)):
+				if np.max(grid_data[i])>global_max:
+					global_max = np.max(grid_data[i])
 				if grid_data[i].max()>0:
-					grid_data[i][(grid_data[i]==0)] = np.max(grid_data[i][(grid_data[i]>0)])-dynamic_range_weights
+					grid_data[i][(grid_data[i]==0)] = 10**(np.log10(np.max(grid_data[i][(grid_data[i]>0)]))-dynamic_range_weights)
 				grid_data[i] = np.log10(grid_data[i])
 
 		if not weight:
@@ -236,9 +240,9 @@ class RenderVolume(object):
 			for i in range(len(grid_data)):
 				if grid_data[i].max()==0: #skip any bins with zero weight
 					continue
-				otf = self._get_opacities(grid_data[i].max()-dynamic_range_weights, grid_data[i].max(), max_opacity, 'low')
+				otf = self._get_opacities(global_max-dynamic_range_weights, global_max, max_opacity, 'low')
 				sf = mayavi.tools.pipeline.scalar_field(grid_data[i])
-				V_part = mlab.pipeline.volume(sf, color=tuple(colortable[i]/255), vmin=grid_data[i].max()-dynamic_range_weights, vmax=grid_data[i].max())
+				V_part = mlab.pipeline.volume(sf, color=tuple(colortable[i]/255), vmin=global_max-dynamic_range_weights, vmax=global_max)
 				V_part.trait_get('volume_mapper')['volume_mapper'].blend_mode = 'maximum_intensity'
 				V_part._otf = otf
 				V_part._volume_property.set_scalar_opacity(otf)
