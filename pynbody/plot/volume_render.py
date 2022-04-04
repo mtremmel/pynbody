@@ -166,9 +166,9 @@ class RenderVolume(object):
 		if not colortable:
 			#default to something reasonable
 			if weight:
-				colortable = np.array(palettable.matplotlib.viridis_4.colors)
+				colortable = np.array(palettable.matplotlib.Viridis_4.colors)
 			else:
-				colortable = np.array(palettable.matplotlib.viridis_16.colors)
+				colortable = np.array(palettable.matplotlib.Viridis_4.colors)
 			if qty in ['tform', 'age']:
 				if weight:
 					colortable = np.array(palettable.lightbartlein.diverging.BlueOrange10_4.colors)
