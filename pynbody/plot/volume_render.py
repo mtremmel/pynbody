@@ -168,14 +168,14 @@ class RenderVolume(object):
 			if weight:
 				colortable = np.array(palettable.matplotlib.Viridis_4.colors)
 			else:
-				colortable = np.array(palettable.matplotlib.Viridis_4.colors)
+				colortable = np.array(palettable.matplotlib.Viridis_16.colors)
 			if qty in ['tform', 'age']:
 				if weight:
 					colortable = np.array(palettable.lightbartlein.diverging.BlueOrange10_4.colors)
 				else:
 					colortable = np.array(palettable.lightbartlein.diverging.BlueOrange10_6.colors)
 			if qty == 'temp':
-				if weigth:
+				if weight:
 					colortable = np.array(palettable.lightbartlein.diverging.BlueDarkRed18_4.colors)
 				else:
 					colortable = np.array(palettable.lightbartlein.diverging.BlueDarkRed18_16.colors)
