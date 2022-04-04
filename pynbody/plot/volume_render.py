@@ -80,7 +80,8 @@ class RenderVolume(object):
 					vmin = vmax - dynamic_range
 				else:
 					vmin = np.log10(ss[filt.HighPass(qty, 0)][qty].min())
-		bins = np.arange(vmin, vmax, (vmax - vmin) / nbins)
+		binsize  = (vmax-vmin)/nbins
+		bins = np.arange(vmin, vmax+binsize, binsize)
 		return bins
 
 	def _create_grid_data(self, qty, nbins, family=None, width=None, recalc=False, weight=None,
