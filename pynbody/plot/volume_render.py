@@ -177,7 +177,7 @@ class RenderVolume(object):
 					colortable = np.array(palettable.lightbartlein.diverging.BlueOrange10_6.colors)
 			if qty == 'temp':
 				if weight:
-					colortable = np.array(palettable.lightbartlein.diverging.BlueDarkRed18_4.colors)
+					colortable = np.array(palettable.lightbartlein.diverging.RedYellowBlue_3.colors)
 				else:
 					colortable = np.array(palettable.lightbartlein.diverging.BlueDarkRed18_16.colors)
 			if qty == 'rho':
