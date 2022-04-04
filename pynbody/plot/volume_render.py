@@ -243,7 +243,7 @@ class RenderVolume(object):
 			for i in range(len(grid_data)):
 				if np.abs(grid_data[i].max()) == np.inf: #skip any bins with zero weight
 					continue
-				otf = self._get_opacities(global_max-dynamic_range_weights, np.max(grid_data[i]), max_opacity, 'low')
+				otf = self._get_opacities(np.max(grid_data[i])-dynamic_range_weights, np.max(grid_data[i]), max_opacity, 'low')
 				sf = mayavi.tools.pipeline.scalar_field(grid_data[i])
 				V_part = mlab.pipeline.volume(sf, color=tuple(colortable[i]/255), vmin=np.max(grid_data[i])-dynamic_range_weights, vmax=np.max(grid_data[i]))
 				V_part.trait_get('volume_mapper')['volume_mapper'].blend_mode = 'maximum_intensity'
