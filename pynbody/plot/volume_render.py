@@ -216,12 +216,15 @@ class RenderVolume(object):
 			grid_data[(grid_data > np.max(bins))] = np.max(bins)
 		else: #weighted data is always assumed to be log space
 			global_max = np.max(grid_data[0])
-			for i in range(len(grid_data)):
+			for i in range(len(grid_data)): #find global maximum across all bins
 				if np.max(grid_data[i])>global_max:
 					global_max = np.max(grid_data[i])
-				if grid_data[i].max()>0:
-					grid_data[i][(grid_data[i]==0)] = 10**(np.log10(np.max(grid_data[i][(grid_data[i]>0)]))-dynamic_range_weights)
+			if global_max==0:
+				raise RuntimeError("weighted quantities is zero across all bins!")
+			for i in range(len(grid_data)): #avoid nans and infinities when taking a log
+				grid_data[i][(grid_data[i]<global_max)] = 10**(np.log10(global_max)-dynamic_range_weights)
 				grid_data[i] = np.log10(grid_data[i])
+			global_max = np.log10(global_max)
 
 		if not weight:
 			otf = self._get_opacities(np.min(bins), np.max(bins), max_opacity, cut)
