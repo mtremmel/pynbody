@@ -215,7 +215,7 @@ class RenderVolume(object):
 			grid_data[(grid_data < np.min(bins))] = np.min(bins)
 			grid_data[(grid_data > np.max(bins))] = np.max(bins)
 		else: #weighted data is always assumed to be log space
-			global_max = np.max(grid_data[i])
+			global_max = np.max(grid_data[0])
 			for i in range(len(grid_data)):
 				if np.max(grid_data[i])>global_max:
 					global_max = np.max(grid_data[i])
