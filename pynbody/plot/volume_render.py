@@ -222,7 +222,7 @@ class RenderVolume(object):
 			if global_max==0:
 				raise RuntimeError("weighted quantities is zero across all bins!")
 			for i in range(len(grid_data)): #avoid nans and infinities when taking a log
-				grid_data[i][(grid_data[i]<global_max)] = 10**(np.log10(global_max)-dynamic_range_weights)
+				grid_data[i][(grid_data[i] < global_max/10**dynamic_range_weights)] = global_max/10**dynamic_range_weights
 				grid_data[i] = np.log10(grid_data[i])
 			global_max = np.log10(global_max)
 
