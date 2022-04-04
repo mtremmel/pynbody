@@ -114,7 +114,7 @@ class RenderVolume(object):
 
 		if data_name in self._loaded_data.keys() and not recalc:
 			print("using previously calculated data grid")
-			grid_data = self._loaded_data[data_name]
+			grid_data = np.copy(self._loaded_data[data_name])
 
 		else:
 			grid_data = sph.to_3d_grid(ss, qty=qty, nx=self.resolution,
@@ -122,7 +122,7 @@ class RenderVolume(object):
 			if weight:
 				grid_data = self._create_binned_grid_data(ss, weight, qty, bins, width, log)
 			if save:
-				self._loaded_data[data_name] = grid_data
+				self._loaded_data[data_name] = np.copy(grid_data)
 		return grid_data, bins
 
 	def _get_opacities(self, vmin, vmax, max_opacity, cut):
@@ -156,7 +156,7 @@ class RenderVolume(object):
 		newsize = float(size) #make sure the input actually can be converted
 		self._starsize = newsize
 
-	def render(self, qty, family=None, width=None, vmin=None, vmax=None, dynamic_range=4,
+	def render(self, qty, family=None, width=None, vmin=None, vmax=None, dynamic_range=4, dynamic_range_weights=8,
 	           log=True, color=None, colortable=None, create_figure=True,
 	           recalc=False, clear=True, cut='low', max_opacity=None, weight=None):
 
@@ -177,7 +177,7 @@ class RenderVolume(object):
 					colortable = np.array(palettable.lightbartlein.diverging.BlueOrange10_6.colors)
 			if qty == 'temp':
 				if weight:
-					colortable = np.array(palettable.lightbartlein.diverging.RedYellowBlue_3.colors)
+					colortable = np.array(palettable.lightbartlein.diverging.RedYellowBlue_3_r.colors)
 				else:
 					colortable = np.array(palettable.lightbartlein.diverging.BlueDarkRed18_16.colors)
 			if qty == 'rho':
@@ -216,7 +216,7 @@ class RenderVolume(object):
 		else: #weighted data is always assumed to be log space
 			for i in range(len(grid_data)):
 				if grid_data[i].max()>0:
-					grid_data[i][(grid_data[i]==0)] = np.min(grid_data[i][(grid_data[i]>0)])/100
+					grid_data[i][(grid_data[i]==0)] = np.max(grid_data[i][(grid_data[i]>0)])-dynamic_range_weights
 				grid_data[i] = np.log10(grid_data[i])
 
 		if not weight:
@@ -236,9 +236,9 @@ class RenderVolume(object):
 			for i in range(len(grid_data)):
 				if grid_data[i].max()==0: #skip any bins with zero weight
 					continue
-				otf = self._get_opacities(grid_data[i].max()-dynamic_range, grid_data[i].max(), max_opacity, 'low')
+				otf = self._get_opacities(grid_data[i].max()-dynamic_range_weights, grid_data[i].max(), max_opacity, 'low')
 				sf = mayavi.tools.pipeline.scalar_field(grid_data[i])
-				V_part = mlab.pipeline.volume(sf, color=tuple(colortable[i]/255), vmin=grid_data[i].max()-dynamic_range, vmax=grid_data[i].max())
+				V_part = mlab.pipeline.volume(sf, color=tuple(colortable[i]/255), vmin=grid_data[i].max()-dynamic_range_weights, vmax=grid_data[i].max())
 				V_part.trait_get('volume_mapper')['volume_mapper'].blend_mode = 'maximum_intensity'
 				V_part._otf = otf
 				V_part._volume_property.set_scalar_opacity(otf)
