@@ -58,7 +58,7 @@ class RenderVolume(object):
 		output = []
 		for i in range(len(bins)-1):
 			if log:
-				ss_part = ss[filt.BandPass(binned_qty, 10*bins[i], 10**bins[i+1])]
+				ss_part = ss[filt.BandPass(binned_qty, 10**bins[i], 10**bins[i+1])]
 			else:
 				ss_part = ss[filt.BandPass(binned_qty, bins[i], bins[i + 1])]
 			grid_part = sph.to_3d_grid(ss_part, qty=qty, nx=self.resolution,
@@ -161,16 +161,27 @@ class RenderVolume(object):
 
 		import mayavi
 		from mayavi import mlab
-		from tvtk.util.ctf import PiecewiseFunction, ColorTransferFunction
 		import palettable
 
 		if not colortable:
+			#default to something reasonable
+			if weight:
+				colortable = np.array(palettable.matplotlib.viridis_4.colors)
+			else:
+				colortable = np.array(palettable.matplotlib.viridis_16.colors)
 			if qty in ['tform', 'age']:
-				colortable = np.array(palettable.lightbartlein.diverging.BlueOrange10_6.colors)
+				if weight:
+					colortable = np.array(palettable.lightbartlein.diverging.BlueOrange10_4.colors)
+				else:
+					colortable = np.array(palettable.lightbartlein.diverging.BlueOrange10_6.colors)
 			if qty == 'temp':
-				colortable = np.array(palettable.lightbartlein.diverging.BlueDarkRed18_4.colors)
-			if qty not in ['tform','age','temp']:
-				colortable = np.array(palettable.cubehelix.cubehelix1_16.colors)
+				if weigth:
+					colortable = np.array(palettable.lightbartlein.diverging.BlueDarkRed18_4.colors)
+				else:
+					colortable = np.array(palettable.lightbartlein.diverging.BlueDarkRed18_16.colors)
+			if qty == 'rho':
+				if not weight:
+					colortable = np.array(palettable.cubehelix.cubehelix1_16.colors)
 
 		nbins = len(colortable)
 
@@ -203,7 +214,7 @@ class RenderVolume(object):
 			grid_data[(grid_data > np.max(bins))] = np.max(bins)
 		else: #weighted data is always assumed to be log space
 			for i in range(len(grid_data)):
-				grid_data[i][(grid_data==0)] = np.min(grid_data[i][(grid_data[i]>0)])/100
+				grid_data[i][(grid_data[i]==0)] = np.min(grid_data[i][(grid_data[i]>0)])/100
 				grid_data[i] = np.log10(grid_data[i])
 
 
