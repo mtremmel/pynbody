@@ -215,11 +215,9 @@ class RenderVolume(object):
 			grid_data[(grid_data > np.max(bins))] = np.max(bins)
 		else: #weighted data is always assumed to be log space
 			for i in range(len(grid_data)):
-				grid_data[i][(grid_data[i]==0)] = np.min(grid_data[i][(grid_data[i]>0)])/100
+				if grid_data[i].max()>0:
+					grid_data[i][(grid_data[i]==0)] = np.min(grid_data[i][(grid_data[i]>0)])/100
 				grid_data[i] = np.log10(grid_data[i])
-
-
-
 
 		if not weight:
 			otf = self._get_opacities(np.min(bins), np.max(bins), max_opacity, cut)
@@ -236,6 +234,8 @@ class RenderVolume(object):
 		else:
 			V = []
 			for i in range(len(grid_data)):
+				if grid_data[i].max()==0: #skip any bins with zero weight
+					continue
 				otf = self._get_opacities(grid_data[i].max()-dynamic_range, grid_data[i].max(), max_opacity, 'low')
 				sf = mayavi.tools.pipeline.scalar_field(grid_data[i])
 				V_part = mlab.pipeline.volume(sf, color=tuple(colortable[i]/255), vmin=grid_data[i].max()-dynamic_range, vmax=grid_data[i].max())
