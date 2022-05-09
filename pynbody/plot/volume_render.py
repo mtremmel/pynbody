@@ -73,7 +73,7 @@ class RenderVolume(object):
 			else:
 				vmax = np.log10(ss[filt.HighPass(qty,0)][qty].max())
 		if vmin is None:
-			if not log or not dynamic_range:
+			if not log:
 				vmin = ss[qty].min()
 			if log:
 				if dynamic_range:
@@ -117,10 +117,11 @@ class RenderVolume(object):
 			grid_data = np.copy(self._loaded_data[data_name])
 
 		else:
-			grid_data = sph.to_3d_grid(ss, qty=qty, nx=self.resolution,
-		                           x2=None if width is None else width / 2)
 			if weight:
 				grid_data = self._create_binned_grid_data(ss, weight, qty, bins, width, log)
+			else:
+				grid_data = sph.to_3d_grid(ss, qty=qty, nx=self.resolution,
+			                           x2=None if width is None else width / 2)
 			if save:
 				self._loaded_data[data_name] = np.copy(grid_data)
 		return grid_data, bins
