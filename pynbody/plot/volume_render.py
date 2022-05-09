@@ -216,7 +216,7 @@ class RenderVolume(object):
 					raise ValueError("Provided color name does not match default colors", default_colors.keys())
 				color = default_colors[color]
 
-		if colortable:
+		if colortable is not None:
 			nbins = len(colortable)
 
 		if type(qty) != str:
@@ -261,7 +261,7 @@ class RenderVolume(object):
 		otf = _get_opacities(global_min, global_max, max_opacity, cut)
 		sf = mayavi.tools.pipeline.scalar_field(grid_data)
 		V = mlab.pipeline.volume(sf, color=color, vmin=global_min, vmax=global_max)
-		if colortable:
+		if colortable is not None:
 			bins = _set_bins(vmin, vmax, dynamic_range, log, nbins)
 			print("bins created:", bins)
 			ctf = _create_colormap(colortable,bins)
