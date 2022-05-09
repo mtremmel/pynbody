@@ -5,8 +5,13 @@ from .. import sph, config
 from .. import units as _units
 from .. import filt, array
 
+default_colors = {  'red': (1., 0., 0.),
+					'blue': (0., 0., 1.),
+					'yellow':  (1.,1., 0.),
+					'green': (0.,1.,0.)
+					}
 
-def _create_colormap(self, colortable, vbins):
+def _create_colormap(colortable, vbins):
 	from tvtk.util.ctf import ColorTransferFunction
 
 	ctf = ColorTransferFunction()
@@ -16,20 +21,7 @@ def _create_colormap(self, colortable, vbins):
 
 	return ctf
 
-def _set_bins(ss, qty, vmin, vmax, dynamic_range, log, nbins):
-	if vmax is None:
-		if not log:
-			vmax = ss[qty].max()
-		else:
-			vmax = np.log10(ss[filt.HighPass(qty,0)][qty].max())
-	if vmin is None:
-		if not log:
-			vmin = ss[qty].min()
-		if log:
-			if dynamic_range:
-				vmin = vmax - dynamic_range
-			else:
-				vmin = np.log10(ss[filt.HighPass(qty, 0)][qty].min())
+def _set_bins(vmin, vmax, dynamic_range, log, nbins):
 	binsize  = (vmax-vmin)/nbins
 	bins = np.arange(vmin, vmax+binsize, binsize)
 	return bins
@@ -152,8 +144,7 @@ class RenderVolume(object):
 	# 			self._loaded_data[data_name] = np.copy(grid_data)
 	# 	return grid_data, bins
 
-	def _create_grid_data(self, qty, nbins, filter=None, family=None, width=None, recalc=False, weight=None,
-	                      vmin=None, vmax=None, log=True, save=True, dynamic_range=4):
+	def _create_grid_data(self, qty, filter=None, family=None, width=None, recalc=False, save=True):
 		ss = self.sim
 		data_name = 'all_'+qty
 		if family in ['star','stars']:
@@ -177,13 +168,13 @@ class RenderVolume(object):
 				data_name += '_'+str(filter._max)
 			ss = ss[filter]
 
-		bins = _set_bins(ss, qty, vmin, vmax, dynamic_range, log, nbins)
+		#bins = _set_bins(ss, qty, vmin, vmax, dynamic_range, log, nbins)
 
-		if data_name in self._loaded_data.keys() and weight:
-			if nbins != len(self._loaded_data[data_name]):
-				if not recalc:
-					print("Warning! Provided colortable requires different binning... recalculating weighted 3d render")
-					recalc = True
+		# if data_name in self._loaded_data.keys() and weight:
+		# 	if nbins != len(self._loaded_data[data_name]):
+		# 		if not recalc:
+		# 			print("Warning! Provided colortable requires different binning... recalculating weighted 3d render")
+		# 			recalc = True
 
 		if data_name in self._loaded_data.keys() and not recalc:
 			print("using previously calculated data grid")
@@ -194,13 +185,13 @@ class RenderVolume(object):
 			                           x2=None if width is None else width / 2)
 			if save:
 				self._loaded_data[data_name] = np.copy(grid_data)
-		return grid_data, bins
+		return grid_data
 
 	def set_starsize(self, size):
 		newsize = float(size) #make sure the input actually can be converted
 		self._starsize = newsize
 
-	def render(self, qty, limqty=None, limmin=None, limmax=None, family=None, width=None, vmin=None, vmax=None, dynamic_range=4, dynamic_range_weights=8,
+	def render(self, qty, filter=None, family=None, width=None, vmin=None, vmax=None, dynamic_range=4,
 	           log=True, color=None, colortable=None, create_figure=True,
 	           recalc=False, clear=True, cut='low', max_opacity=None, weight=None):
 
@@ -208,7 +199,9 @@ class RenderVolume(object):
 		from mayavi import mlab
 		import palettable
 
-		if not colortable and not color:
+		nbins = None
+
+		if colortable is None and color is None:
 			#default to something reasonable
 			colortable = np.array(palettable.matplotlib.Viridis_16.colors)
 			if qty in ['tform', 'age']:
@@ -217,8 +210,14 @@ class RenderVolume(object):
 				colortable = np.array(palettable.lightbartlein.diverging.BlueDarkRed18_16.colors)
 			if qty == 'rho':
 				colortable = np.array(palettable.cubehelix.cubehelix1_16.colors)
+		if color:
+			if type(color)==str:
+				if color not in default_colors.keys():
+					raise ValueError("Provided color name does not match default colors", default_colors.keys())
+				color = default_colors[color]
 
-		nbins = len(colortable)
+		if colortable:
+			nbins = len(colortable)
 
 		if type(qty) != str:
 			raise ValueError("qty must be a string, e.g. 'rho', 'temp'")
@@ -232,35 +231,43 @@ class RenderVolume(object):
 				smf = filt.HighPass('smooth', str(self._starsize) + ' kpc')
 				self.sim.s[smf]['smooth'] = array.SimArray(self._starsize, 'kpc', sim=self.sim)
 
-		grid_data, bins = self._create_grid_data(qty, nbins, family=family, width=width, recalc=recalc, weight=weight,
-		                                   vmin=vmin, vmax=vmax, log=log, dynamic_range=dynamic_range)
-
-		print("bins calculated: ", bins)
+		grid_data = self._create_grid_data(qty, filter=filter, family=family, width=width, recalc=recalc)
 
 		if create_figure:
 			fig = mlab.figure(size=(500, 500), bgcolor=(0, 0, 0))
 		if clear:
 			mlab.clf()
 
-		global_max = None
-		global_max = np.max(grid_data[0])
-		for i in range(len(grid_data)): #find global maximum across all bins
-			if np.max(grid_data[i])>global_max:
-				global_max = np.max(grid_data[i])
-		if global_max==0:
-			raise RuntimeError("weighted quantities is zero across all bins!")
-		for i in range(len(grid_data)): #avoid nans and infinities when taking a log
-			grid_data[i][(grid_data[i] < np.max(grid_data[i])/10**dynamic_range_weights)] = np.max(grid_data[i])/10**dynamic_range_weights
-			grid_data[i] = np.log10(grid_data[i])
-		global_max = np.log10(global_max)
+		if dynamic_range:
+			grid_data[(grid_data < np.max(grid_data) / 10 ** dynamic_range)] = np.max(
+				grid_data) / 10 ** dynamic_range
 
-		otf = _get_opacities(np.min(bins), np.max(bins), max_opacity, cut)
+		if log:
+			if vmin:
+				grid_data[(grid_data<10**vmin)] = 10**vmin
+			if vmax:
+				grid_data[(grid_data>10**vmax)] = 10**vmax
+
+			grid_data = np.log10(grid_data)
+		else:
+			if vmax:
+				grid_data[(grid_data >vmax)] = vmax
+			if vmin:
+				grid_data[(grid_data<vmin)] = vmin
+
+		global_max = np.max(grid_data)
+		global_min = np.min(grid_data)
+
+		otf = _get_opacities(global_min, global_max, max_opacity, cut)
 		sf = mayavi.tools.pipeline.scalar_field(grid_data)
-		V = mlab.pipeline.volume(sf, color=color, vmin=np.min(bins), vmax=np.max(bins))
-		ctf = _create_colormap(colortable,bins)
-		V._volume_property.set_color(ctf)
-		V._ctf = ctf
-		V.update_ctf = True
+		V = mlab.pipeline.volume(sf, color=color, vmin=global_min, vmax=global_max)
+		if colortable:
+			bins = _set_bins(vmin, vmax, dynamic_range, log, nbins)
+			print("bins created:", bins)
+			ctf = _create_colormap(colortable,bins)
+			V._volume_property.set_color(ctf)
+			V._ctf = ctf
+			V.update_ctf = True
 		V.trait_get('volume_mapper')['volume_mapper'].blend_mode = 'maximum_intensity'
 		V._otf = otf
 		V._volume_property.set_scalar_opacity(otf)
