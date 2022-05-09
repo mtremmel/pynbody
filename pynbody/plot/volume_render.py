@@ -21,7 +21,7 @@ def _create_colormap(colortable, vbins):
 
 	return ctf
 
-def _set_bins(vmin, vmax, dynamic_range, log, nbins):
+def _set_bins(vmin, vmax, nbins):
 	binsize  = (vmax-vmin)/nbins
 	bins = np.arange(vmin, vmax+binsize, binsize)
 	return bins
@@ -262,7 +262,7 @@ class RenderVolume(object):
 		sf = mayavi.tools.pipeline.scalar_field(grid_data)
 		V = mlab.pipeline.volume(sf, color=color, vmin=global_min, vmax=global_max)
 		if colortable is not None:
-			bins = _set_bins(vmin, vmax, dynamic_range, log, nbins)
+			bins = _set_bins(global_min, global_max, nbins)
 			print("bins created:", bins)
 			ctf = _create_colormap(colortable,bins)
 			V._volume_property.set_color(ctf)
