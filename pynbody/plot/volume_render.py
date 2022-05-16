@@ -181,6 +181,11 @@ class RenderVolume(object):
 			grid_data = np.copy(self._loaded_data[data_name])
 
 		else:
+			if family in ['star', 'stars']:
+				if self._starsize:
+					smf = filt.HighPass('smooth', str(self._starsize) + ' kpc')
+					ss[smf]['smooth'] = array.SimArray(self._starsize, 'kpc', sim=self.sim)
+
 			grid_data = sph.to_3d_grid(ss, qty=qty, nx=self.resolution,
 			                           x2=None if width is None else width / 2)
 			if save:
@@ -226,11 +231,6 @@ class RenderVolume(object):
 			if family not in ['gas','star','stars','dm', 'dark']:
 				raise ValueError("family must be one of these strings: 'gas','star','dm'")
 
-		if family in ['star','stars']:
-			if self._starsize:
-				smf = filt.HighPass('smooth', str(self._starsize) + ' kpc')
-				self.sim.s[smf]['smooth'] = array.SimArray(self._starsize, 'kpc', sim=self.sim)
-
 		grid_data = self._create_grid_data(qty, filter=filter, family=family, width=width, recalc=recalc)
 
 		if create_figure:
@@ -241,19 +241,19 @@ class RenderVolume(object):
 		if dynamic_range:
 			grid_data[(grid_data < np.max(grid_data) / 10 ** dynamic_range)] = np.max(
 				grid_data) / 10 ** dynamic_range
-
-		if log:
-			if vmin:
-				grid_data[(grid_data<10**vmin)] = 10**vmin
-			if vmax:
-				grid_data[(grid_data>10**vmax)] = 10**vmax
-
-			grid_data = np.log10(grid_data)
 		else:
-			if vmax:
-				grid_data[(grid_data >vmax)] = vmax
-			if vmin:
-				grid_data[(grid_data<vmin)] = vmin
+			if log:
+				if vmin:
+					grid_data[(grid_data<10**vmin)] = 10**vmin
+				if vmax:
+					grid_data[(grid_data>10**vmax)] = 10**vmax
+
+				grid_data = np.log10(grid_data)
+			else:
+				if vmax:
+					grid_data[(grid_data >vmax)] = vmax
+				if vmin:
+					grid_data[(grid_data<vmin)] = vmin
 
 		global_max = np.max(grid_data)
 		global_min = np.min(grid_data)
