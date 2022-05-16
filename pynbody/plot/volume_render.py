@@ -149,13 +149,16 @@ class RenderVolume(object):
 		data_name = 'all_'+qty
 		if family in ['star','stars']:
 			data_name = 'star_'+qty
-			ss = self.sim.s[filt.HighPass('tform',0)] #remove black holes
+			if ss is not None:
+				ss = self.sim.s[filt.HighPass('tform',0)] #remove black holes
 		if family=='gas':
 			data_name = 'gas_' + qty
-			ss = self.sim.g
+			if ss is not None:
+				ss = self.sim.g
 		if family in ['dm','dark']:
 			data_name = 'dm_' + qty
-			ss = self.sim.dm
+			if ss is not None:
+				ss = self.sim.dm
 
 		if width:
 			data_name = data_name+'_'+str(width)
