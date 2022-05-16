@@ -254,13 +254,14 @@ class RenderVolume(object):
 					grid_data[(grid_data<10**vmin)] = 10**vmin
 				if vmax:
 					grid_data[(grid_data>10**vmax)] = 10**vmax
-
-				grid_data = np.log10(grid_data)
 			else:
 				if vmax:
 					grid_data[(grid_data >vmax)] = vmax
 				if vmin:
 					grid_data[(grid_data<vmin)] = vmin
+
+		if log:
+			grid_data = np.log10(grid_data)
 
 		global_max = np.max(grid_data)
 		global_min = np.min(grid_data)
