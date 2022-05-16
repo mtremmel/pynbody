@@ -184,6 +184,8 @@ class RenderVolume(object):
 			grid_data = np.copy(self._loaded_data[data_name])
 
 		else:
+			if ss is None:
+				raise ValueError("simulation has not been provided (None) but requested data does not already exist")
 			if family in ['star', 'stars']:
 				if self._starsize:
 					smf = filt.HighPass('smooth', str(self._starsize) + ' kpc')
