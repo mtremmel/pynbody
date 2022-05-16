@@ -75,6 +75,7 @@ class RenderVolume(object):
 		import pickle
 		f = open(filename,'rb')
 		saved_data = pickle.load(f)
+		f.close()
 		if type(saved_data)!=dict:
 			raise ValueError("Error Loading datafile "+filename+" Expecting a pickle file with a dictionary of 3d grids!")
 		for key in saved_data.keys():
@@ -169,7 +170,8 @@ class RenderVolume(object):
 				data_name += '_'+str(filter._min)
 			if hasattr(filter,'_max'):
 				data_name += '_'+str(filter._max)
-			ss = ss[filter]
+			if ss is not None:
+				ss = ss[filter]
 
 		#bins = _set_bins(ss, qty, vmin, vmax, dynamic_range, log, nbins)
 
