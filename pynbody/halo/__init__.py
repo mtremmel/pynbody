@@ -76,7 +76,7 @@ from numpy.typing import NDArray
 
 from .. import array, snapshot, units, util
 from ..util import iter_subclasses
-from .details.iord_mapping import make_iord_to_offset_mapper
+from .details.iord_mapping import make_iord_to_offset_mapper, make_iord_to_offset_mapper_from_file
 from .details.number_mapping import (
     HaloNumberMapper,
     MonotonicHaloNumberMapper,
@@ -324,23 +324,28 @@ class HaloCatalogue(snapshot.util.ContainerWithPhysicalUnitsOption,
         """The snapshot object that this halo catalogue is based on."""
         return self._base()
 
-    def _init_iord_to_fpos(self):
+    def _init_iord_to_fpos(self, ordered_iord_info=None):
         """Create a member array, _iord_to_fpos, that maps particle IDs to file positions.
 
         This is a convenience function for subclasses to use."""
         if not hasattr(self, "_iord_to_fpos"):
-            if 'iord' in self.base.loadable_keys() or 'iord' in self.base.keys():
-                self._iord_to_fpos = make_iord_to_offset_mapper(self.base['iord'])
+            if ordered_iord_info is None:
+                if 'iord' in self.base.loadable_keys() or 'iord' in self.base.keys():
+                    self._iord_to_fpos = make_iord_to_offset_mapper(self.base['iord'])
 
-            else:
-                warnings.warn("No iord array available; assuming halo catalogue is using sequential particle IDs",
+                else:
+                    warnings.warn("No iord array available; assuming halo catalogue is using sequential particle IDs",
                               RuntimeWarning)
 
-                class OneToOneIndex:
-                    def __getitem__(self, i):
-                        return i
+                    class OneToOneIndex:
+                        def __getitem__(self, i):
+                            return i
 
-                self._iord_to_fpos = OneToOneIndex()
+                    self._iord_to_fpos = OneToOneIndex()
+            else:
+                self._iord_to_fpos = make_iord_to_offset_mapper_from_file(ordered_iord_info)
+
+
 
     def _get_subhalo_catalogue(self, parent_halo_number: int) -> SubhaloCatalogue:
         from .subhalo_catalogue import SubhaloCatalogue
