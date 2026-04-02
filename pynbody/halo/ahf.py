@@ -97,6 +97,7 @@ class AHFCatalogue(HaloCatalogue):
         self._use_iord = use_iord
         self._only_stat = only_stat
         self._try_writing_fpos = write_fpos
+        self._iord_info = None
 
         if only_stat:
             warnings.warn(DeprecationWarning("only_stat keyword is deprecated; instead, use the catalogue's get_dummy_halo method"))
@@ -125,7 +126,13 @@ class AHFCatalogue(HaloCatalogue):
         self._remap_host_halo_property()
 
         if self._use_iord:
-            self._init_iord_to_fpos()
+            if os.path.exists(self._ahfBasename+'iordInfo.npy'):
+                try:
+                    self._iord_info = np.load(self._ahfBasename+'iordInfo.npy', allow_pickle=True)
+                except:
+                    warnings.warn("iordInfo.npy file cannot be read. Reverting to loading all iords directly.")
+                    self._iord_info = None
+            self._init_iord_to_fpos(ordered_iord_info=iord_info)
 
         try:
             self._load_ahf_substructure(self._ahfBasename + 'substructure')
@@ -297,7 +304,10 @@ class AHFCatalogue(HaloCatalogue):
         ns = len(self.base.star)
         nds = nd + ns
         if self._use_iord:
-            data = self._iord_to_fpos.map_ignoring_order(data)
+            if self._iord_info is None:
+                data = self._iord_to_fpos.map_ignoring_order(data)
+            else: #if we have iord information, we assume the iords can be mapped in order to indices
+                data = self._iord_to_fpos.map_preserving_order(data)
         elif isinstance(self.base, snapshot.ramses.RamsesSnap):
             # AHF only expects three families, DM, star, gas in this order
             # and generates iords on disc according to this rule
