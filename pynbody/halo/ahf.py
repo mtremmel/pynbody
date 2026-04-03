@@ -132,7 +132,7 @@ class AHFCatalogue(HaloCatalogue):
                 except:
                     warnings.warn("iordInfo.npy file cannot be read. Reverting to loading all iords directly.")
                     self._iord_info = None
-            self._init_iord_to_fpos(ordered_iord_info=iord_info)
+            self._init_iord_to_fpos(ordered_iord_info=self._iord_info)
 
         try:
             self._load_ahf_substructure(self._ahfBasename + 'substructure')
