@@ -36,10 +36,10 @@ class IordToOffsetFromFileAscending(IordToOffsetFromFile):
         for block in self._iord_info:
             mask_block = (i>=block['first_iord'])&(i<=block['last_iord']) #get all iords within the block
             offset_array[mask_block] = i[mask_block] - block['first_iord'] + block['ind_start'] #produce an initial offset
-            missed_lower = block['missed_iords']<i[mask_block].min()
+            missed_lower = block['missing_iords']<i[mask_block].min()
             #shift entire set by the number of missing iords below the minimum of this block in the given list
-            offset_array[mask_block] -= len(block['missed_iords'][missed_lower])
-            missing_in_halo = (block['missed_iords']>i[mask_block].min()) & (block['missed_iords']<i[mask_block].max())
+            offset_array[mask_block] -= len(block['missing_iords'][missed_lower])
+            missing_in_halo = (block['missing_iords']>i[mask_block].min()) & (block['missing_iords']<i[mask_block].max())
             print('number of missing iords within halo:', len(block['missing_iords'][missing_in_halo]))
             for missed in block['missing_iords'][missing_in_halo]:
                 mask_missed = mask_block & (i>missed)
