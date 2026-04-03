@@ -29,7 +29,7 @@ class IordToOffsetFromFileAscending(IordToOffsetFromFile):
         self._iord_info = iord_info
         for i in range(len(self._iord_info)): #make sure missing iords are also in ascending order
             osort = np.argsort(self._iord_info[i]['missing_iords'])
-            self.iord_info[i]['missing_iords'] = self.iord_info[i]['missing_iords'][osort]
+            self._iord_info[i]['missing_iords'] = self._iord_info[i]['missing_iords'][osort]
 
     def do_map(self,i):
         offset_array = np.ones(len(i))*-1 #initialize an array of index values
@@ -60,7 +60,7 @@ class IordToOffsetFromFileDescending(IordToOffsetFromFileAscending): #same as As
             self._iord_info[i]['last_iord'] *= -1
             self._iord_info[i]['first_iord'] *= -1
             osort = np.argsort(self._iord_info[i]['missing_iords'])
-            self.iord_info[i]['missing_iords'] = self.iord_info[i]['missing_iords'][osort]
+            self._iord_info[i]['missing_iords'] = self._iord_info[i]['missing_iords'][osort]
     
     def map_preserving_order(self,i):
         i *= -1 #again, we multiply the input particle iords by -1 to turn them into ascending order
