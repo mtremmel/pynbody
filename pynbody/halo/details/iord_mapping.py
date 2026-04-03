@@ -44,7 +44,7 @@ class IordToOffsetFromFileAscending(IordToOffsetFromFile):
             bad_low = offset_array[mask_block][osort_block]<block['ind_start']
             print("low index!", offset_array[mask_block][osort_block][bad_low], i[mask_block][osort_block[bad_low]])
             bad_high = offset_array[mask_block][osort_block]<block['ind_end']
-            print("high index!", offset_array[mask_block][osort_block][bad_high]], i[mask_block][osort_block[bad_high]])
+            print("high index!", offset_array[mask_block][osort_block][bad_high], i[mask_block][osort_block[bad_high]])
         good = offset_array>=0 #we only care about those elements that were able to be mapped to indices.
         #if the iord information file does not encompass all iords in the halo, those missing will be ignored.
         if len(offset_array[good])<len(offset_array) and len(offset_array[good])>0:
