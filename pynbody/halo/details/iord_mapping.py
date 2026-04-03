@@ -32,7 +32,7 @@ class IordToOffsetFromFileAscending(IordToOffsetFromFile):
             self._iord_info[i]['missing_iords'] = self._iord_info[i]['missing_iords'][osort]
 
     def do_map(self,i):
-        offset_array = np.ones(len(i))*-1 #initialize an array of index values
+        offset_array = np.ones(len(i)).astype(np.int64)*-1 #initialize an array of index values
         for block in self._iord_info:
             mask_block = (i>=block['first_iord'])&(i<=block['last_iord']) #get all iords within the block
             offset_array[mask_block] = i[mask_block] - block['first_iord'] + block['ind_start'] #produce an initial offset
@@ -43,7 +43,7 @@ class IordToOffsetFromFileAscending(IordToOffsetFromFile):
                 offset_array[mask_block][osort_block[ind:]]-=cnt
             bad_low = offset_array[mask_block][osort_block]<block['ind_start']
             print("low index!", offset_array[mask_block][osort_block][bad_low], i[mask_block][osort_block[bad_low]])
-            bad_high = offset_array[mask_block][osort_block]<block['ind_end']
+            bad_high = offset_array[mask_block][osort_block]>block['ind_end']
             print("high index!", offset_array[mask_block][osort_block][bad_high], i[mask_block][osort_block[bad_high]])
         good = offset_array>=0 #we only care about those elements that were able to be mapped to indices.
         #if the iord information file does not encompass all iords in the halo, those missing will be ignored.
