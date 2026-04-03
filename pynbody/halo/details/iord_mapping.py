@@ -35,7 +35,7 @@ class IordToOffsetFromFileAscending(IordToOffsetFromFile):
         offset_array = np.ones(len(i)).astype(np.int64)*-1 #initialize an array of index values
         for block in self._iord_info:
             mask_block = (i>=block['first_iord'])&(i<=block['last_iord']) #get all iords within the block
-            block_ind = np.where(mass_block)[0]
+            block_ind = np.where(mask_block)[0]
             offset_array[block_ind] = i[block_ind] - block['first_iord'] + block['ind_start'] #produce an initial offset
             osort_block = np.argsort(i[block_ind])
             ind_miss = np.searchsorted(i[block_ind],block['missing_iords'],sorter=osort_block)
