@@ -33,6 +33,7 @@ class IordToOffsetFromFileAscending(IordToOffsetFromFile):
 
     def do_map(self,i):
         offset_array = np.ones(len(i)).astype(np.int64)*-1 #initialize an array of index values
+        cnt = 1
         for block in self._iord_info:
             mask_block = (i>=block['first_iord'])&(i<=block['last_iord']) #get all iords within the block
             block_ind = np.where(mask_block)[0]
@@ -42,10 +43,11 @@ class IordToOffsetFromFileAscending(IordToOffsetFromFile):
             uind_miss, cnt_miss = np.unique(ind_miss,return_counts=True)
             for ind,cnt in zip(uind_miss,cnt_miss):
                 offset_array[block_ind[osort_block[ind:]]]-=cnt
-            bad_low = offset_array[mask_block][osort_block]<block['ind_start']
-            print("low index!", offset_array[mask_block][osort_block][bad_low], i[mask_block][osort_block[bad_low]])
-            bad_high = offset_array[mask_block][osort_block]>block['ind_end']
-            print("high index!", offset_array[mask_block][osort_block][bad_high], i[mask_block][osort_block[bad_high]])
+            if offset_array[mask_block][osort_block].min()<block['ind_start']:
+                warnings.warn("indices found for halo particles go below the provided starting indices for block", cnt, "provided in file")
+            if offset_array[mask_block][osort_block].max()>block['ind_end']:
+                warnings.warn("indices found for halo particles go above the provided starting indices for block", cnt, "provided in file")
+            cnt += 1
         good = offset_array>=0 #we only care about those elements that were able to be mapped to indices.
         #if the iord information file does not encompass all iords in the halo, those missing will be ignored.
         if len(offset_array[good])<len(offset_array) and len(offset_array[good])>0:
