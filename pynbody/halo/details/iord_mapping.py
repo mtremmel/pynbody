@@ -44,9 +44,9 @@ class IordToOffsetFromFileAscending(IordToOffsetFromFile):
             for ind,cnt in zip(uind_miss,cnt_miss):
                 offset_array[block_ind[osort_block[ind:]]]-=cnt
             if offset_array[mask_block][osort_block].min()<block['ind_start']:
-                warnings.warn("indices found for halo particles go below the provided starting indices for block", cnt, "provided in file")
+                warnings.warn("indices found for halo particles go below the provided starting indices for block provided in file", RuntimeWarning)
             if offset_array[mask_block][osort_block].max()>block['ind_end']:
-                warnings.warn("indices found for halo particles go above the provided starting indices for block", cnt, "provided in file")
+                warnings.warn("indices found for halo particles go above the provided starting indices for block provided in file", RuntimeWarning)
             cnt += 1
         good = offset_array>=0 #we only care about those elements that were able to be mapped to indices.
         #if the iord information file does not encompass all iords in the halo, those missing will be ignored.
