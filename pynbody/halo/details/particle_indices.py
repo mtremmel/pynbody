@@ -35,12 +35,11 @@ class HaloParticleIndices:
 
         Requires a HaloNumberMapper to map halo indices to halo numbers. If None is passed for the number_mapper,
         the halo indices are returned instead."""
-        #lengths = np.diff(self.particle_index_list_boundaries, axis=1).ravel()
-        #ordering = np.argsort(-lengths, kind='stable')
+        lengths = np.diff(self.particle_index_list_boundaries, axis=1).ravel()
+        ordering = np.argsort(-lengths, kind='stable')
 
         id_array = np.empty(sim_length, dtype=dtype)
         id_array.fill(fill_value)
-        ordering = np.arange(len(self._halo_properties['ID']))
         if number_mapper is not None:
             halo_numbers = number_mapper.index_to_number(ordering)
         else:
