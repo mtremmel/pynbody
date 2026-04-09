@@ -464,7 +464,7 @@ from . import (
 class LoadedGenericHaloCatalogue(HaloCatalogue):
     def __init__(self,sim,filename=None):
         if filename is None:
-            filename = sim.filename
+            filename = f"{sim._filename}"
         filename = filename + '.pynbody.halos' #file must end in pynbody.halos
         self._filename = filename
         with open(filename,'rb') as f:
@@ -487,8 +487,8 @@ class LoadedGenericHaloCatalogue(HaloCatalogue):
     @classmethod
     def _can_load(cls, sim, basename, **kwargs):
         if basename is not None:
-            basename = sim.filename
-        filename = basename+'.pynbody.halos'
+            basename = sim._filename
+        filename = f"{basename}.pynbody.halos"
         return os.path.exists(filename)
     
     #a single halo can still be loaded without loading in the entire particle ID list
