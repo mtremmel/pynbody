@@ -189,6 +189,7 @@ class HaloCatalogue(snapshot.util.ContainerWithPhysicalUnitsOption,
 
     def __init__(self, sim, number_mapper):
         self._base: weakref[snapshot.SimSnap] = weakref.ref(sim)
+        self._basename = sim._filename
         self.number_mapper: HaloNumberMapper = number_mapper
         self._index_lists: HaloParticleIndices | None = None
         self._properties: dict | None = None
@@ -213,7 +214,7 @@ class HaloCatalogue(snapshot.util.ContainerWithPhysicalUnitsOption,
         """Saves relevant information to a pickle file that can be read later"""
         self.load_all() #get all the particle information for all halos
         if filename is None:
-            filename = self._base.filename
+            filename = f"{self._basename}"
         outname = filename+'.pynbody.halos'
         with open(outname,'wb') as f:
             pickle.dump(self.number_mapper,f)
