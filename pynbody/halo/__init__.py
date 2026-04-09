@@ -219,6 +219,7 @@ class HaloCatalogue(snapshot.util.ContainerWithPhysicalUnitsOption,
         with open(outname,'wb') as f:
             pickle.dump(self.number_mapper,f)
             pickle.dump(self.__class__,f)
+            pickle.dump(self._properties,f)
             pickle.dump(self._index_lists.particle_index_list_boundaries,f)
             pickle.dump(self._index_lists.particle_index_list.dtype,f)
             #save the particle indices at the end in a way that will allow for seeking specific halos
@@ -471,6 +472,7 @@ class LoadedGenericHaloCatalogue(HaloCatalogue):
             print("Loading In Data from file", filename)
             number_mapper = pickle.load(f)
             self._original_class = pickle.load(f)
+            self._properties = pickle.load(f)
             self._particle_id_boundaries = pickle.load(f)
             self._particle_id_type = pickle.load(f)
             self._particle_read_start = f.tell()
