@@ -145,49 +145,6 @@ class Halo(snapshot.subsnap.IndexedSubSnap):
             # Convert own properties
             self._autoconvert_properties()
 
-class LoadedGenericHaloCatalogue(HaloCatalogue):
-    def __init__(self,sim,filename=None):
-        if filename is None:
-            filename = sim.filename
-        filename = filename + '.pynbody.halos' #file must end in pynbody.halos
-        self._filename = filename
-        with open(filename,'rb') as f:
-            print("Loading In Data from file", filename)
-            number_mapper = pickle.load(f)
-            self._original_class = pickle.load(f)
-            self._particle_id_boundaries = pickle.load(f)
-            self._particle_id_type = pickle.load(f)
-            self._particle_read_start = f.tell()
-        super().__init__(sim,number_mapper=number_mapper)
-
-    def load_all(self):
-        if not self._index_lists:
-            with open(self._filename,'rb') as f:
-                f.seek(self._particle_read_start)
-                particle_ids = np.fromfile(f,dtype=self._particle_id_type)
-                index_lists = HaloParticleIndices(particle_ids,self._particle_id_boundaries)
-                self._index_lists = index_lists
-
-    @classmethod
-    def _can_load(cls, sim, basename, **kwargs):
-        if basename is not None:
-            basename = sim.filename
-        filename = basename+'.pynbody.halos'
-        return os.path.exists(filename)
-    
-    #a single halo can still be loaded without loading in the entire particle ID list
-    def _get_particle_indices_one_halo(self, halo_number):
-        file_index = self.number_mapper.number_to_index(halo_number)
-        with util.open_(self._filename) as f:
-            f.seek(self._particle_read_start)
-            file_offset = self._particle_id_boundaries[file_index,0]*self._particle_id_type.itemsize
-            npart = self._halo_properties['npart'][file_index]
-            id = np.fromfile(f,count=npart,offset=file_offset,dtype=int)
-        return id
-
-
-
-
 class HaloCatalogue(snapshot.util.ContainerWithPhysicalUnitsOption,
                     iter_subclasses.IterableSubclasses):
 
@@ -503,6 +460,46 @@ from . import (
     subfindhdf,
     velociraptor,
 )
+
+class LoadedGenericHaloCatalogue(HaloCatalogue):
+    def __init__(self,sim,filename=None):
+        if filename is None:
+            filename = sim.filename
+        filename = filename + '.pynbody.halos' #file must end in pynbody.halos
+        self._filename = filename
+        with open(filename,'rb') as f:
+            print("Loading In Data from file", filename)
+            number_mapper = pickle.load(f)
+            self._original_class = pickle.load(f)
+            self._particle_id_boundaries = pickle.load(f)
+            self._particle_id_type = pickle.load(f)
+            self._particle_read_start = f.tell()
+        super().__init__(sim,number_mapper=number_mapper)
+
+    def load_all(self):
+        if not self._index_lists:
+            with open(self._filename,'rb') as f:
+                f.seek(self._particle_read_start)
+                particle_ids = np.fromfile(f,dtype=self._particle_id_type)
+                index_lists = HaloParticleIndices(particle_ids,self._particle_id_boundaries)
+                self._index_lists = index_lists
+
+    @classmethod
+    def _can_load(cls, sim, basename, **kwargs):
+        if basename is not None:
+            basename = sim.filename
+        filename = basename+'.pynbody.halos'
+        return os.path.exists(filename)
+    
+    #a single halo can still be loaded without loading in the entire particle ID list
+    def _get_particle_indices_one_halo(self, halo_number):
+        file_index = self.number_mapper.number_to_index(halo_number)
+        with util.open_(self._filename) as f:
+            f.seek(self._particle_read_start)
+            file_offset = self._particle_id_boundaries[file_index,0]*self._particle_id_type.itemsize
+            npart = self._halo_properties['npart'][file_index]
+            id = np.fromfile(f,count=npart,offset=file_offset,dtype=int)
+        return id
 
 
 def _fix_american_spelling(p):
