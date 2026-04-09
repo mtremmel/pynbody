@@ -485,10 +485,10 @@ class LoadedGenericHaloCatalogue(HaloCatalogue):
                 self._index_lists = index_lists
 
     @classmethod
-    def _can_load(cls, sim, basename, **kwargs):
-        if basename is not None:
-            basename = sim._filename
-        filename = f"{basename}.pynbody.halos"
+    def _can_load(cls, sim, filename=None, **kwargs):
+        if basename is None:
+            basename =  f"{sim._filename}"
+        filename = basename+".pynbody.halos"
         return os.path.exists(filename)
     
     #a single halo can still be loaded without loading in the entire particle ID list
