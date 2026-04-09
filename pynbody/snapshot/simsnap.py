@@ -828,6 +828,8 @@ class SimSnap(ContainerWithPhysicalUnitsOption, iter_subclasses.IterableSubclass
                               config['halo-class-priority'])
 
         priority = [halo._fix_american_spelling(p) for p in priority]
+        #regardless of priority, we want to load in a saved catalogue first if possible
+        priority = [halo.LoadedGenericHaloCatalogue] + priority
 
         for c in halo.HaloCatalogue.iter_subclasses_with_priority(priority):
             try:
