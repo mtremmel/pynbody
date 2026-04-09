@@ -472,11 +472,12 @@ class LoadedGenericHaloCatalogue(HaloCatalogue):
             print("Loading In Data from file", filename)
             number_mapper = pickle.load(f)
             self._original_class = pickle.load(f)
-            self._properties = pickle.load(f)
+            halo_properties = pickle.load(f)
             self._particle_id_boundaries = pickle.load(f)
             self._particle_id_type = pickle.load(f)
             self._particle_read_start = f.tell()
         super().__init__(sim,number_mapper=number_mapper)
+        self._properties = halo_properties
 
     def load_all(self):
         if not self._index_lists:
