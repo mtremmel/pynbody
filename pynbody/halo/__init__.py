@@ -497,7 +497,7 @@ class LoadedGenericHaloCatalogue(HaloCatalogue):
         with util.open_(self._filename) as f:
             f.seek(self._particle_read_start)
             file_offset = self._particle_id_boundaries[file_index,0]*self._particle_id_type.itemsize
-            npart = self._halo_properties['npart'][file_index]
+            npart = self._particle_id_boundaries[file_index,1] - self._particle_id_boundaries[file_index,0]
             id = np.fromfile(f,count=npart,offset=file_offset,dtype=int)
         return id
 
