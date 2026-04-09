@@ -221,7 +221,6 @@ class HaloCatalogue(snapshot.util.ContainerWithPhysicalUnitsOption,
             pickle.dump(self.__class__,f)
             pickle.dump(self._index_lists.particle_index_list_boundaries,f)
             pickle.dump(self._index_lists.particle_index_list.dtype,f)
-            pickle.dump(len(self._index_lists.particle_index_list))
             #save the particle indices at the end in a way that will allow for seeking specific halos
             self._index_lists.particle_index_list.tofile(f)
 
