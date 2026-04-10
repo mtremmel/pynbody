@@ -463,7 +463,7 @@ from . import (
 )
 
 class LoadedGenericHaloCatalogue(HaloCatalogue):
-    def __init__(self,sim,filename=None):
+    def __init__(self,sim,filename=None,**kwargs):
         if filename is None:
             filename = f"{sim._filename}"
         filename = filename + '.pynbody.halos' #file must end in pynbody.halos
