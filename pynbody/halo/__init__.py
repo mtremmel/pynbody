@@ -504,6 +504,9 @@ class LoadedGenericHaloCatalogue(HaloCatalogue):
             id = np.fromfile(f,count=npart,offset=file_offset,dtype=int)
         return id
 
+    def get_properties_all_halos(self, with_units=True) -> dict:
+        return self._properties
+
 
 def _fix_american_spelling(p):
     """Map American to British spelling (used by SimSnap.halos to allow flexible spelling)"""
